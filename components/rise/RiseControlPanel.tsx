@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Minus, Plus, Play, Flag, ListPlus, RotateCcw } from 'lucide-react'
+import { Minus, Plus, Play, Flag, ListPlus, RotateCcw, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT, adjustCounter } from '@/lib/rise'
 import { rankEntries, entryValue } from '@/types/rise'
@@ -46,9 +46,24 @@ export function RiseControlPanel({
     await supabase.from('rise_events').update({ status }).eq('id', event.id)
   }
 
+  async function resetEvent() {
+    if (busy) return
+    if (!window.confirm(
+      'Reset this event?\n\nThis permanently clears ALL scores, timers, counters and round progress for this event. Athletes, teams and judge links are kept.\n\nThis cannot be undone.'
+    )) return
+    setBusy(true)
+    await supabase.from('rise_entries').delete().eq('event_id', event.id)
+    await supabase.from('rise_rounds').update({ status: 'pending' }).eq('event_id', event.id)
+    await supabase.from('rise_events').update({ status: 'setup' }).eq('id', event.id)
+    setEntries([])
+    setRounds(prev => prev.map(r => ({ ...r, status: 'pending' })))
+    setEvent(prev => ({ ...prev, status: 'setup' }))
+    setBusy(false)
+  }
+
   return (
     <div className="space-y-6">
-      <StatusBar event={event} onSet={setStatus} />
+      <StatusBar event={event} onSet={setStatus} onReset={resetEvent} busy={busy} />
       {event.is_team ? (
         <TeamControl
           event={event}
@@ -76,15 +91,15 @@ export function RiseControlPanel({
   )
 }
 
-function StatusBar({ event, onSet }: { event: RiseEvent; onSet: (s: RiseStatus) => void }) {
+function StatusBar({ event, onSet, onReset, busy }: { event: RiseEvent; onSet: (s: RiseStatus) => void; onReset: () => void; busy: boolean }) {
   const opts: RiseStatus[] = ['setup', 'live', 'ended']
   return (
-    <div className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+    <div className="flex flex-wrap items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
       <div>
         <h1 className="text-lg font-bold text-white">{event.name}</h1>
         <p className="text-xs text-zinc-500 uppercase tracking-wider">Live control room</p>
       </div>
-      <div className="flex gap-1.5">
+      <div className="flex items-center gap-1.5">
         {opts.map(s => (
           <button
             key={s}
@@ -98,6 +113,15 @@ function StatusBar({ event, onSet }: { event: RiseEvent; onSet: (s: RiseStatus) 
             {s}
           </button>
         ))}
+        <button
+          onClick={onReset}
+          disabled={busy}
+          className="ml-2 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md font-semibold uppercase tracking-wider bg-red-950/60 text-red-400 border border-red-900/60 hover:bg-red-900/50 disabled:opacity-50 transition-colors"
+          title="Clear all scores and round progress for this event"
+        >
+          <AlertTriangle size={13} />
+          Reset
+        </button>
       </div>
     </div>
   )

@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { RiseJudgeClient } from '@/components/rise/RiseJudgeClient'
-import { RiseJudgeRoster } from '@/components/rise/RiseJudgeRoster'
+import { RiseJudge } from '@/components/rise/RiseJudge'
 import { ENTRY_SELECT } from '@/lib/rise'
 import type { RiseCompetitor, RiseEntry, RiseEvent, RiseJudgeToken } from '@/types/rise'
 
@@ -31,11 +30,13 @@ export default async function RiseJudgePage({ params }: { params: Promise<{ toke
     if (scope.competitor_id) query = query.eq('competitor_id', scope.competitor_id)
     const { data: entries } = await query
     return (
-      <RiseJudgeClient
+      <RiseJudge
+        token={token}
         event={event}
-        label={t.label ?? event.name}
+        mode="scoped"
         scope={scope}
         initialEntries={(entries as RiseEntry[] | null) ?? []}
+        competitors={[]}
       />
     )
   }
@@ -47,11 +48,13 @@ export default async function RiseJudgePage({ params }: { params: Promise<{ toke
   ])
 
   return (
-    <RiseJudgeRoster
+    <RiseJudge
+      token={token}
       event={event}
-      label={t.label ?? 'Judge'}
-      competitors={(competitors as RiseCompetitor[] | null) ?? []}
+      mode="roster"
+      scope={scope}
       initialEntries={(entries as RiseEntry[] | null) ?? []}
+      competitors={(competitors as RiseCompetitor[] | null) ?? []}
     />
   )
 }
