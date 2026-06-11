@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { LayoutDashboard, Plus } from 'lucide-react'
+import { LayoutDashboard, Plus, Flame } from 'lucide-react'
 import LogoutButton from '@/components/LogoutButton'
 
 export const dynamic = 'force-dynamic'
@@ -14,6 +14,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex items-center gap-1">
           <NavLink href="/admin/tournaments" icon={<LayoutDashboard size={15} />}>
             Tournaments
+          </NavLink>
+          <NavLink href="/admin/rise" icon={<Flame size={15} />}>
+            RISE Event
           </NavLink>
           <Link
             href="/admin/tournaments/new"

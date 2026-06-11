@@ -1,0 +1,57 @@
+import { createClient } from '@/lib/supabase/server'
+import { notFound } from 'next/navigation'
+import { RiseJudgeClient } from '@/components/rise/RiseJudgeClient'
+import { RiseJudgeRoster } from '@/components/rise/RiseJudgeRoster'
+import { ENTRY_SELECT } from '@/lib/rise'
+import type { RiseCompetitor, RiseEntry, RiseEvent, RiseJudgeToken } from '@/types/rise'
+
+export const dynamic = 'force-dynamic'
+
+export default async function RiseJudgePage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params
+  const supabase = await createClient()
+
+  const { data: tokenRow } = await supabase
+    .from('rise_judge_tokens')
+    .select('*, event:rise_events(*)')
+    .eq('token', token)
+    .single()
+
+  if (!tokenRow) notFound()
+
+  const t = tokenRow as RiseJudgeToken & { event: RiseEvent }
+  const event = t.event
+  const scope = t.scope ?? {}
+  const isScoped = !!(scope.team_id || scope.competitor_id)
+
+  // Scoped token (e.g. a RISE team) → bind directly to that entry.
+  if (isScoped) {
+    let query = supabase.from('rise_entries').select(ENTRY_SELECT).eq('event_id', event.id)
+    if (scope.team_id) query = query.eq('team_id', scope.team_id)
+    if (scope.competitor_id) query = query.eq('competitor_id', scope.competitor_id)
+    const { data: entries } = await query
+    return (
+      <RiseJudgeClient
+        event={event}
+        label={t.label ?? event.name}
+        scope={scope}
+        initialEntries={(entries as RiseEntry[] | null) ?? []}
+      />
+    )
+  }
+
+  // Event-scoped token → roster picker (one device scores many athletes).
+  const [{ data: competitors }, { data: entries }] = await Promise.all([
+    supabase.from('rise_competitors').select('*').eq('event_id', event.id).order('name'),
+    supabase.from('rise_entries').select(ENTRY_SELECT).eq('event_id', event.id),
+  ])
+
+  return (
+    <RiseJudgeRoster
+      event={event}
+      label={t.label ?? 'Judge'}
+      competitors={(competitors as RiseCompetitor[] | null) ?? []}
+      initialEntries={(entries as RiseEntry[] | null) ?? []}
+    />
+  )
+}

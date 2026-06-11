@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Registration exports (contain PII) and crash artifacts
+*.csv
+*.stackdump
