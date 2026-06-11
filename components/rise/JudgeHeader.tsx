@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronLeft, Radio } from 'lucide-react'
+import { RiseWordmark } from './RiseBrand'
 
 export function JudgeHeader({
   eventName,
@@ -33,7 +34,10 @@ export function JudgeHeader({
           <p className="text-sm font-bold text-white truncate">{label}</p>
         </div>
       </div>
-      {right && <span className="text-[10px] font-bold tracking-widest text-[#2f5fe0] uppercase shrink-0">{right}</span>}
+      <div className="flex flex-col items-end gap-1 shrink-0">
+        <RiseWordmark className="h-3 w-auto opacity-80" />
+        {right && <span className="text-[10px] font-bold tracking-widest text-[#4d7bff] uppercase">{right}</span>}
+      </div>
     </div>
   )
 }

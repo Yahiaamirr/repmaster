@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { ChevronRight, Users, User, Timer, Dumbbell, ArrowUp } from 'lucide-react'
 import type { RiseEvent } from '@/types/rise'
-import { RiseWordmark, RiseCoBrandFooter } from '@/components/rise/RiseBrand'
+import { RiseWordmark, RiseFooter } from '@/components/rise/RiseBrand'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,16 +20,19 @@ export default async function RiseIndexPage() {
   const list = (events as RiseEvent[] | null) ?? []
 
   return (
-    <div className="min-h-[100dvh] bg-[#05070f] text-white">
-      <header className="relative text-center py-14 px-4 border-b border-[#1a2547] overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(47,95,224,0.25),transparent_60%)]" />
+    <div className="relative min-h-[100dvh] bg-[#070e24] text-white">
+      {/* page-wide blue wash */}
+      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(180deg,#0c1a44_0%,#070e24_45%)]" />
+      <div className="relative">
+      <header className="relative text-center py-12 px-4 border-b border-[#243668] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(47,95,224,0.5),transparent_62%)]" />
         <div className="relative">
-          <div className="inline-flex items-center gap-2 text-[#4d7bff] text-xs font-bold tracking-[4px] uppercase mb-6">
+          <div className="inline-flex items-center gap-2 text-[#4d7bff] text-xs font-bold tracking-[4px] uppercase mb-5">
             <span className="w-1.5 h-1.5 bg-[#4d7bff] rounded-full animate-pulse" />
             Live Now
           </div>
           <div className="flex justify-center">
-            <RiseWordmark className="h-16 sm:h-24 w-auto" />
+            <RiseWordmark className="h-7 sm:h-9 w-auto" />
           </div>
           <p className="text-zinc-400 mt-5 text-sm uppercase tracking-[0.3em]">Opening Event · Live Leaderboards</p>
         </div>
@@ -40,24 +43,27 @@ export default async function RiseIndexPage() {
           <Link
             key={ev.id}
             href={`/rise/${ev.slug}`}
-            className="group flex items-center gap-4 rounded-2xl border border-[#1a2547] bg-[#0b1226] px-5 py-5 transition-colors hover:border-[#2f5fe0]/50 hover:bg-[#101a3a]"
+            className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[#243668] bg-[#0e1838] px-5 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2f5fe0]/70 hover:bg-[#15234f] hover:shadow-[0_8px_30px_-12px_rgba(47,95,224,0.6)] motion-reduce:hover:translate-y-0"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#2f5fe0]/15 text-[#2f5fe0]">
+            {/* left accent bar lights up on hover */}
+            <span className="absolute left-0 top-0 h-full w-1 bg-[#2f5fe0] scale-y-0 origin-center transition-transform duration-200 group-hover:scale-y-100" />
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#2f5fe0]/15 text-[#4d7bff] transition-all duration-200 group-hover:bg-[#2f5fe0] group-hover:text-white group-hover:scale-110">
               {ICONS[ev.slug] ?? <User size={20} />}
             </span>
             <div className="flex-1 min-w-0">
-              <p className="font-black text-lg truncate">{ev.name}</p>
+              <p className="font-black text-lg truncate transition-colors group-hover:text-[#4d7bff]">{ev.name}</p>
               <p className="text-xs text-zinc-500 uppercase tracking-wider">
                 {ev.is_team ? 'Team event' : 'Individual · Men & Women'}
               </p>
             </div>
-            <ChevronRight size={20} className="text-zinc-600 transition-transform group-hover:translate-x-0.5 group-hover:text-[#2f5fe0]" />
+            <ChevronRight size={20} className="text-zinc-600 transition-all duration-200 group-hover:translate-x-1 group-hover:text-[#2f5fe0]" />
           </Link>
         ))}
         {list.length === 0 && (
           <p className="text-center text-zinc-600 py-12">No events seeded yet. Run the RISE migrations.</p>
         )}
-        <RiseCoBrandFooter />
+        <RiseFooter />
+      </div>
       </div>
     </div>
   )

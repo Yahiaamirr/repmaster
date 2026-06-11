@@ -119,11 +119,11 @@ export function RiseJudge({
     return (
       <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center">
         <div className="flex items-center gap-3 mb-2">
-          <RiseWordmark className="h-9 w-auto" />
+          <RiseWordmark className="h-5 w-auto" />
           {event.slug === RLNTLSS_SLUG && (
             <>
               <span className="text-zinc-700 text-sm">×</span>
-              <RlntlssMark className="h-10 w-auto" />
+              <RlntlssMark className="h-6 w-auto" />
             </>
           )}
         </div>
@@ -159,7 +159,8 @@ export function RiseJudge({
   if (resolving || !owner) {
     return (
       <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center">
-        <MonitorSmartphone size={40} className="text-zinc-700 mb-4 animate-pulse" />
+        <RiseWordmark className="h-4 w-auto opacity-80 mb-8" />
+        <MonitorSmartphone size={40} className="text-[#4d7bff] mb-4 animate-pulse" />
         <p className="text-zinc-400 text-sm">Connecting…</p>
       </div>
     )
@@ -169,6 +170,7 @@ export function RiseJudge({
   if (!isOwner) {
     return (
       <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center select-none">
+        <RiseWordmark className="h-4 w-auto opacity-80 mb-6" />
         <div className="flex items-center gap-1.5 text-xs text-zinc-500 mb-8 font-mono">{event.name}</div>
         <Lock size={48} className="text-[#2f5fe0] mb-6" />
         <h1 className="text-2xl font-black text-white mb-2">Open on another device</h1>

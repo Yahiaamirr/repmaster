@@ -76,7 +76,7 @@ export function RiseRoster({
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Athlete name"
-          className="flex-1 min-w-[150px] bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#2f5fe0]"
+          className="flex-1 min-w-[150px] bg-[#16224a] border border-[#2c3d72] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#2f5fe0]"
         />
         <GenderToggle value={gender} onChange={setGender} />
         <button
@@ -97,7 +97,7 @@ export function RiseRoster({
           <span className="text-[#4d7bff] font-bold">{women}</span> women
         </span>
         {list.length > 6 && (
-          <div className="flex items-center gap-1.5 rounded-lg bg-zinc-800 border border-zinc-700 px-2">
+          <div className="flex items-center gap-1.5 rounded-lg bg-[#16224a] border border-[#2c3d72] px-2">
             <Search size={13} className="text-zinc-500" />
             <input
               value={q}
@@ -114,7 +114,7 @@ export function RiseRoster({
       ) : (
         <ul className="space-y-1 max-h-[420px] overflow-y-auto pr-1">
           {filtered.map(c => (
-            <li key={c.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-zinc-800/60 group">
+            <li key={c.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#16224a]/60 group">
               {editId === c.id ? (
                 <>
                   <input
@@ -122,11 +122,11 @@ export function RiseRoster({
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') saveEdit(c.id); if (e.key === 'Escape') setEditId(null) }}
-                    className="flex-1 min-w-0 bg-zinc-800 border border-[#2f5fe0]/50 rounded px-2 py-1 text-sm text-white outline-none"
+                    className="flex-1 min-w-0 bg-[#16224a] border border-[#2f5fe0]/50 rounded px-2 py-1 text-sm text-white outline-none"
                   />
                   <GenderToggle value={editGender} onChange={setEditGender} small />
-                  <button onClick={() => saveEdit(c.id)} className="p-1.5 text-green-400 hover:bg-zinc-700 rounded" title="Save"><Check size={15} /></button>
-                  <button onClick={() => setEditId(null)} className="p-1.5 text-zinc-400 hover:bg-zinc-700 rounded" title="Cancel"><X size={15} /></button>
+                  <button onClick={() => saveEdit(c.id)} className="p-1.5 text-green-400 hover:bg-[#1d2c5c] rounded" title="Save"><Check size={15} /></button>
+                  <button onClick={() => setEditId(null)} className="p-1.5 text-zinc-400 hover:bg-[#1d2c5c] rounded" title="Cancel"><X size={15} /></button>
                 </>
               ) : (
                 <>
@@ -146,14 +146,14 @@ export function RiseRoster({
 
 function GenderToggle({ value, onChange, small }: { value: RiseGender; onChange: (g: RiseGender) => void; small?: boolean }) {
   return (
-    <div className="flex rounded-lg overflow-hidden border border-zinc-700 shrink-0">
+    <div className="flex rounded-lg overflow-hidden border border-[#2c3d72] shrink-0">
       {(['M', 'F'] as const).map(g => (
         <button
           key={g}
           type="button"
           onClick={() => onChange(g)}
           className={`${small ? 'px-2 py-1 text-[10px]' : 'px-3 py-2 text-xs'} font-bold uppercase transition-colors ${
-            value === g ? 'bg-[#2f5fe0] text-white' : 'bg-zinc-800 text-zinc-400'
+            value === g ? 'bg-[#2f5fe0] text-white' : 'bg-[#16224a] text-zinc-400'
           }`}
         >
           {g === 'M' ? 'M' : 'F'}

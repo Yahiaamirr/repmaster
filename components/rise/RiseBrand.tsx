@@ -1,32 +1,29 @@
 /* eslint-disable @next/next/no-img-element */
 // Brand lockups for the RISE Opening Event section.
 // Assets live in /public/rise (white-on-transparent, theme-ready).
+// NOTE: the Relentless mark must ONLY appear on Relentless events (RLNTLSS_SLUG).
 
-export function RiseWordmark({ className = 'h-12 w-auto' }: { className?: string }) {
-  return <img src="/rise/rise-wordmark.png" alt="RISE — Superhuman" className={className} draggable={false} />
+export function RiseWordmark({ className = 'h-4 w-auto' }: { className?: string }) {
+  return <img src="/rise/rise-wordmark.png" alt="RISE — Superhuman" className={`select-none ${className}`} draggable={false} />
 }
 
-export function RlntlssMark({ className = 'h-10 w-auto' }: { className?: string }) {
-  return <img src="/rise/rlntlss-mark.png" alt="Relentless" className={className} draggable={false} />
+export function RlntlssMark({ className = 'h-6 w-auto' }: { className?: string }) {
+  return <img src="/rise/rlntlss-mark.png" alt="Relentless" className={`select-none ${className}`} draggable={false} />
 }
 
-export function RlntlssSlogan({ className = 'h-24 w-auto' }: { className?: string }) {
-  return <img src="/rise/rlntlss-slogan.png" alt="Made for More" className={className} draggable={false} />
+export function RlntlssSlogan({ className = 'h-16 w-auto' }: { className?: string }) {
+  return <img src="/rise/rlntlss-slogan.png" alt="Made for More" className={`select-none ${className}`} draggable={false} />
 }
 
-// Slug of the Relentless-branded event, used to add its mark where relevant.
+// Slug of the Relentless-branded event — gate every Relentless asset behind this.
 export const RLNTLSS_SLUG = 'rlntlss-box-jumps'
 
-// Co-brand strip (RISE presents · Relentless) for footers.
-export function RiseCoBrandFooter() {
+// RISE-only footer (no Relentless co-branding).
+export function RiseFooter() {
   return (
-    <footer className="mt-12 border-t border-[#1a2547] py-8 flex flex-col items-center gap-4">
-      <div className="flex items-center gap-6 opacity-80">
-        <RiseWordmark className="h-7 w-auto" />
-        <span className="text-zinc-700 text-xs">×</span>
-        <RlntlssMark className="h-9 w-auto" />
-      </div>
-      <p className="text-[10px] text-zinc-600 uppercase tracking-[0.35em]">Made for More</p>
+    <footer className="mt-12 border-t border-[#243668] py-8 flex flex-col items-center gap-3">
+      <RiseWordmark className="h-4 w-auto opacity-60" />
+      <p className="text-[10px] text-[#4d7bff]/70 uppercase tracking-[0.35em]">Rise · Superhuman</p>
     </footer>
   )
 }

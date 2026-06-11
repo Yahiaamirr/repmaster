@@ -26,8 +26,8 @@ export default async function AdminRisePage() {
   return (
     <div>
       <div className="mb-8 flex items-center gap-4">
-        <span className="rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-3">
-          <RiseWordmark className="h-8 w-auto" />
+        <span className="rounded-xl bg-[#0e1838] border border-[#243668] px-4 py-2.5">
+          <RiseWordmark className="h-5 w-auto" />
         </span>
         <div>
           <h1 className="text-2xl font-bold">RISE Opening Event</h1>
@@ -38,7 +38,7 @@ export default async function AdminRisePage() {
       </div>
 
       {list.length === 0 ? (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center">
+        <div className="bg-[#0e1838] border border-[#243668] rounded-xl p-8 text-center">
           <p className="text-zinc-300 font-semibold">No RISE events found.</p>
           <p className="text-zinc-500 text-sm mt-2">
             Run <code className="text-[#2f5fe0]">002_rise.sql</code>, <code className="text-[#2f5fe0]">003_rise_seed.sql</code>{' '}
@@ -48,7 +48,7 @@ export default async function AdminRisePage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {list.map(ev => (
-            <div key={ev.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+            <div key={ev.id} className="group bg-[#0e1838] border border-[#243668] rounded-xl p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2f5fe0]/50 hover:shadow-[0_10px_34px_-14px_rgba(47,95,224,0.55)] motion-reduce:hover:translate-y-0">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2f5fe0]/15 text-[#2f5fe0]">
@@ -90,7 +90,7 @@ function StatusBadge({ status }: { status: string }) {
     {
       setup: 'bg-zinc-700 text-zinc-300',
       live: 'bg-green-500/20 text-green-400 border border-green-500/30 animate-pulse',
-      ended: 'bg-zinc-800 text-zinc-500',
+      ended: 'bg-[#16224a] text-zinc-500',
     }[status] ?? 'bg-zinc-700 text-zinc-300'
   return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${styles}`}>{status}</span>
 }
@@ -105,7 +105,7 @@ function CardLink({
   external?: boolean
 }) {
   const cls = `flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
-    highlight ? 'bg-[#2f5fe0] hover:bg-[#2348b8] text-white' : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200'
+    highlight ? 'bg-[#2f5fe0] hover:bg-[#2348b8] text-white' : 'bg-[#16224a] hover:bg-[#1d2c5c] text-zinc-200'
   }`
   if (external) {
     return (
