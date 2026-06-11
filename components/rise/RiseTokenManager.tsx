@@ -107,7 +107,7 @@ export function RiseTokenManager({
   const teamName = (id?: string) => teams.find(t => t.id === id)?.name
 
   return (
-    <div className="bg-[#0e1838] border border-[#243668] rounded-xl p-5">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
       <div className="flex items-center justify-between mb-4 gap-2">
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Judge Links</h2>
         {tokens.length > 0 && (
@@ -115,7 +115,7 @@ export function RiseTokenManager({
             <button
               onClick={revokeAllAndRecreate}
               disabled={busy}
-              className="text-xs px-2.5 py-1.5 bg-[#16224a] hover:bg-[#1d2c5c] disabled:opacity-50 text-zinc-200 rounded-md font-semibold transition-colors"
+              className="text-xs px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-200 rounded-md font-semibold transition-colors"
               title="Revoke every link and generate a fresh default set"
             >
               Revoke all & re-create
@@ -146,7 +146,7 @@ export function RiseTokenManager({
           <select
             value={teamId}
             onChange={e => setTeamId(e.target.value)}
-            className="text-xs bg-[#16224a] border border-[#2c3d72] rounded-md px-2 py-2 text-white outline-none focus:border-[#2f5fe0]"
+            className="text-xs bg-zinc-800 border border-zinc-700 rounded-md px-2 py-2 text-white outline-none focus:border-[#2f5fe0]"
           >
             {teams.map(t => (
               <option key={t.id} value={t.id}>{t.name}</option>
@@ -155,7 +155,7 @@ export function RiseTokenManager({
           <button
             onClick={addTeamJudge}
             disabled={busy}
-            className="flex items-center gap-1.5 text-xs px-3 py-2 bg-[#16224a] hover:bg-[#1d2c5c] disabled:opacity-50 text-white rounded-md font-semibold transition-colors"
+            className="flex items-center gap-1.5 text-xs px-3 py-2 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white rounded-md font-semibold transition-colors"
           >
             <Plus size={14} /> Add judge
           </button>
@@ -211,7 +211,7 @@ function TokenRow({
   }
 
   return (
-    <div className="bg-[#16224a]/60 rounded-lg p-3">
+    <div className="bg-zinc-800/60 rounded-lg p-3">
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-white truncate">{token.label}</p>
@@ -233,7 +233,7 @@ function TokenRow({
         </div>
       </div>
       {showQR && (
-        <div className="mt-3 pt-3 border-t border-[#2c3d72] flex justify-center">
+        <div className="mt-3 pt-3 border-t border-zinc-700 flex justify-center">
           <QRCodeDisplay url={link} label={token.label ?? 'judge'} />
         </div>
       )}

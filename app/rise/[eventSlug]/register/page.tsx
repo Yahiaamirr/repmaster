@@ -15,14 +15,13 @@ export default async function RiseRegisterPage({ params }: { params: Promise<{ e
   const ev = event as RiseEvent
 
   return (
-    <div className="relative min-h-[100dvh] bg-[#070e24] text-white flex flex-col items-center px-6 py-12">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(47,95,224,0.4),transparent_55%)]" />
+    <div className="min-h-[100dvh] bg-[#05070f] text-white flex flex-col items-center px-6 py-12">
       <div className="flex items-center gap-3 mb-2">
-        <RiseWordmark className="h-5 w-auto" />
+        <RiseWordmark className="h-9 w-auto" />
         {ev.slug === RLNTLSS_SLUG && (
           <>
             <span className="text-zinc-700 text-sm">×</span>
-            <RlntlssMark className="h-6 w-auto" />
+            <RlntlssMark className="h-10 w-auto" />
           </>
         )}
       </div>
@@ -42,9 +41,7 @@ export default async function RiseRegisterPage({ params }: { params: Promise<{ e
         )}
       </div>
 
-      <p className="text-[10px] text-zinc-600 uppercase tracking-[0.35em] mt-10">
-        {ev.slug === RLNTLSS_SLUG ? 'Made for More' : 'Rise · Superhuman'}
-      </p>
+      <p className="text-[10px] text-zinc-600 uppercase tracking-[0.35em] mt-10">Made for More</p>
     </div>
   )
 }

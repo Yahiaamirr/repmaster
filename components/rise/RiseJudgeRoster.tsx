@@ -9,7 +9,6 @@ import type { RiseCompetitor, RiseEntry, RiseEvent, RiseGender } from '@/types/r
 import { JudgeCounter } from './JudgeCounter'
 import { JudgeTimer } from './JudgeTimer'
 import { JudgeMeasure } from './JudgeMeasure'
-import { RiseWordmark } from './RiseBrand'
 
 export function RiseJudgeRoster({
   event,
@@ -91,13 +90,8 @@ export function RiseJudgeRoster({
   return (
     <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none">
       <div className="px-4 pt-4 pb-3 border-b border-zinc-900">
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <p className="text-xs text-zinc-500 font-mono truncate">{event.name}</p>
-            <p className="text-sm font-bold text-white truncate">{label}</p>
-          </div>
-          <RiseWordmark className="h-3 w-auto opacity-80 shrink-0" />
-        </div>
+        <p className="text-xs text-zinc-500 font-mono">{event.name}</p>
+        <p className="text-sm font-bold text-white">{label}</p>
         <div className="mt-3 flex items-center gap-2 rounded-xl bg-zinc-900 border border-zinc-800 px-3">
           <Search size={16} className="text-zinc-500" />
           <input

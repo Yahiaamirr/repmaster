@@ -8,7 +8,6 @@ import { rankEntries, entryValue } from '@/types/rise'
 import type {
   RiseCompetitor, RiseEntry, RiseEvent, RiseRound, RiseStatus, RiseTeam,
 } from '@/types/rise'
-import { RiseWordmark } from './RiseBrand'
 
 export function RiseControlPanel({
   event: initialEvent,
@@ -95,16 +94,10 @@ export function RiseControlPanel({
 function StatusBar({ event, onSet, onReset, busy }: { event: RiseEvent; onSet: (s: RiseStatus) => void; onReset: () => void; busy: boolean }) {
   const opts: RiseStatus[] = ['setup', 'live', 'ended']
   return (
-    <div className="relative flex flex-wrap items-center justify-between gap-3 overflow-hidden bg-[#0e1838] border border-[#243668] rounded-xl p-4">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(47,95,224,0.16),transparent_55%)]" />
-      <div className="relative flex items-center gap-3">
-        <span className="rounded-lg bg-[#070e24] border border-[#243668] px-3 py-1.5">
-          <RiseWordmark className="h-4 w-auto" />
-        </span>
-        <div>
-          <h1 className="text-lg font-bold text-white">{event.name}</h1>
-          <p className="text-xs text-[#4d7bff] uppercase tracking-wider">Live control room</p>
-        </div>
+    <div className="flex flex-wrap items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+      <div>
+        <h1 className="text-lg font-bold text-white">{event.name}</h1>
+        <p className="text-xs text-zinc-500 uppercase tracking-wider">Live control room</p>
       </div>
       <div className="flex items-center gap-1.5">
         {opts.map(s => (
@@ -114,7 +107,7 @@ function StatusBar({ event, onSet, onReset, busy }: { event: RiseEvent; onSet: (
             className={`text-xs px-3 py-1.5 rounded-md font-semibold uppercase tracking-wider transition-colors ${
               event.status === s
                 ? s === 'live' ? 'bg-green-500/20 text-green-400 border border-green-500/40' : 'bg-[#2f5fe0] text-white'
-                : 'bg-[#16224a] text-zinc-400 hover:bg-[#1d2c5c]'
+                : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
             }`}
           >
             {s}
@@ -199,7 +192,7 @@ function TeamControl({
 
   return (
     <>
-      <div className="bg-[#0e1838] border border-[#243668] rounded-xl p-5">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Round Flow</h2>
         <div className="flex flex-wrap gap-3 items-center">
           <button onClick={startQual} disabled={busy} className="flex items-center gap-2 px-4 py-2.5 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white rounded-lg font-semibold text-sm transition-colors">
@@ -214,7 +207,7 @@ function TeamControl({
                   type="number"
                   value={(chip as any)[k]}
                   onChange={e => setChip({ ...chip, [k]: Number(e.target.value) })}
-                  className="w-14 bg-[#16224a] border border-[#2c3d72] rounded px-2 py-1 text-white outline-none focus:border-[#2f5fe0]"
+                  className="w-14 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-white outline-none focus:border-[#2f5fe0]"
                 />
               </label>
             ))}
@@ -231,13 +224,13 @@ function TeamControl({
           <p className="text-zinc-500 text-sm col-span-full text-center py-8">Start a round to create team counters.</p>
         ) : (
           roundEntries.map((e, i) => (
-            <div key={e.id} className={`rounded-xl border p-4 ${i === 0 ? 'border-[#2f5fe0]/50 bg-[#17285f]' : 'border-[#243668] bg-[#0e1838]'}`}>
+            <div key={e.id} className={`rounded-xl border p-4 ${i === 0 ? 'border-[#2f5fe0]/50 bg-[#102047]' : 'border-zinc-800 bg-zinc-900'}`}>
               <div className="flex items-center justify-between mb-3">
                 <span className="font-bold text-white">{e.team?.name ?? 'Team'}</span>
                 {e.phase && <span className="text-[10px] uppercase tracking-widest text-zinc-500">{e.phase}</span>}
               </div>
               <div className="flex items-center justify-between">
-                <button onClick={() => override(e, -1)} className="h-12 w-12 flex items-center justify-center bg-[#16224a] active:bg-zinc-700 rounded-lg text-white"><Minus size={20} /></button>
+                <button onClick={() => override(e, -1)} className="h-12 w-12 flex items-center justify-center bg-zinc-800 active:bg-zinc-700 rounded-lg text-white"><Minus size={20} /></button>
                 <span className="text-5xl font-black tabular-nums text-[#2f5fe0]">{e.counter}</span>
                 <button onClick={() => override(e, 1)} className="h-12 w-12 flex items-center justify-center bg-[#2f5fe0] active:bg-[#2348b8] rounded-lg text-white"><Plus size={20} /></button>
               </div>
@@ -276,7 +269,7 @@ function IndividualControl({
 
   return (
     <>
-      <div className="bg-[#0e1838] border border-[#243668] rounded-xl p-5 flex items-center justify-between">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex items-center justify-between">
         <div>
           <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Scoring</h2>
           <p className="text-xs text-zinc-500 mt-1">Judges score via the judge link. This is the live mirror — clear a result to let an athlete re-attempt.</p>
@@ -289,7 +282,7 @@ function IndividualControl({
       {ranked.length === 0 ? (
         <p className="text-zinc-500 text-sm text-center py-8">No athletes on the board yet.</p>
       ) : (
-        <div className="bg-[#0e1838] border border-[#243668] rounded-xl divide-y divide-zinc-800">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl divide-y divide-zinc-800">
           {ranked.map((e, i) => {
             const done = ev.scoring_mode === 'reps' ? e.counter > 0 : ev.scoring_mode === 'measure_max' ? e.measure_value != null : e.time_ms != null
             return (

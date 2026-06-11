@@ -36,16 +36,16 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
       </Link>
 
       {/* Header with brand */}
-      <div className="relative overflow-hidden rounded-2xl border border-[#243668] bg-[#0e1838] p-5 mb-6">
+      <div className="relative overflow-hidden rounded-2xl border border-[#1a2547] bg-[#0b1226] p-5 mb-6">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(47,95,224,0.18),transparent_55%)]" />
         <div className="relative flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <span className="rounded-xl bg-[#070e24] border border-[#243668] px-4 py-2.5 flex items-center gap-3">
-              <RiseWordmark className="h-5 w-auto" />
+            <span className="rounded-xl bg-[#05070f] border border-[#1a2547] px-4 py-3 flex items-center gap-3">
+              <RiseWordmark className="h-7 w-auto" />
               {ev.slug === RLNTLSS_SLUG && (
                 <>
                   <span className="text-zinc-700 text-xs">×</span>
-                  <RlntlssMark className="h-6 w-auto" />
+                  <RlntlssMark className="h-8 w-auto" />
                 </>
               )}
             </span>
@@ -68,7 +68,7 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
             <Link href={`/admin/rise/${ev.slug}/control`} className="flex items-center gap-1.5 text-sm px-4 py-2 bg-[#2f5fe0] hover:bg-[#2348b8] text-white rounded-lg font-semibold transition-colors">
               <Radio size={15} /> Control
             </Link>
-            <a href={`/rise/${ev.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm px-4 py-2 bg-[#16224a] hover:bg-[#1d2c5c] text-white rounded-lg transition-colors">
+            <a href={`/rise/${ev.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors">
               <ExternalLink size={15} /> Board
             </a>
           </div>
@@ -77,7 +77,7 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Roster */}
-        <div className="bg-[#0e1838] border border-[#243668] rounded-xl p-5">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#4d7bff] uppercase tracking-wider mb-4">
             {ev.is_team ? 'Teams' : 'Participants'}
           </h2>
@@ -89,7 +89,7 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
                   <p className="text-sm font-bold text-[#2f5fe0] mb-1">{team.name}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {comps.filter(c => c.team_id === team.id).map(c => (
-                      <span key={c.id} className="text-xs bg-[#16224a] text-zinc-300 px-2 py-0.5 rounded-full">{c.name}</span>
+                      <span key={c.id} className="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-full">{c.name}</span>
                     ))}
                   </div>
                 </div>
@@ -104,7 +104,7 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
         <div className="space-y-6">
           {/* Registration QR (individual events only) */}
           {!ev.is_team && (
-            <div className="bg-[#0e1838] border border-[#243668] rounded-xl p-5">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
               <h2 className="flex items-center gap-2 text-sm font-semibold text-[#4d7bff] uppercase tracking-wider mb-1">
                 <QrCode size={15} /> Registration QR
               </h2>

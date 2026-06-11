@@ -44,9 +44,7 @@ export function RiseLeaderboard({
     null
 
   return (
-    <div className="relative min-h-[100dvh] bg-[#070e24] text-white">
-      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(180deg,#0c1a44_0%,#070e24_45%)]" />
-      <div className="relative">
+    <div className="min-h-[100dvh] bg-[#05070f] text-white">
       <Header event={event} roundName={event.is_team ? activeRound?.name ?? null : null} />
       <div className="px-4 pb-16 max-w-6xl mx-auto">
         {event.is_team ? (
@@ -55,7 +53,6 @@ export function RiseLeaderboard({
           <SplitBoard event={event} entries={entries} />
         )}
       </div>
-      </div>
     </div>
   )
 }
@@ -63,15 +60,15 @@ export function RiseLeaderboard({
 function Header({ event, roundName }: { event: RiseEvent; roundName: string | null }) {
   const isRlntlss = event.slug === RLNTLSS_SLUG
   return (
-    <header className="relative text-center py-9 px-4 border-b border-[#243668] overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(47,95,224,0.45),transparent_62%)]" />
+    <header className="relative text-center py-9 px-4 border-b border-[#1a2547] overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(47,95,224,0.2),transparent_60%)]" />
       <div className="relative">
-        <div className="flex items-center justify-center gap-3 mb-5">
-          <RiseWordmark className="h-4 sm:h-5 w-auto" />
+        <div className="flex items-center justify-center gap-4 mb-5">
+          <RiseWordmark className="h-8 sm:h-10 w-auto" />
           {isRlntlss && (
             <>
               <span className="text-zinc-700 text-sm">×</span>
-              <RlntlssMark className="h-6 w-auto" />
+              <RlntlssMark className="h-10 sm:h-12 w-auto" />
             </>
           )}
         </div>
@@ -125,12 +122,12 @@ function TeamBoard({
         return (
           <div
             key={row.team.id}
-            className={`flex items-center gap-4 rounded-2xl border px-5 py-5 transition-all duration-300 ${
+            className={`flex items-center gap-4 rounded-2xl border px-5 py-5 transition-colors ${
               isLeader
-                ? 'bg-[#17285f] border-[#2f5fe0]/70 shadow-[0_0_40px_-10px_rgba(47,95,224,0.65)]'
+                ? 'bg-[#102047] border-[#2f5fe0]/60'
                 : advancing
-                ? 'bg-[#111d46] border-[#2f5fe0]/30'
-                : 'bg-[#0e1838] border-[#243668]'
+                ? 'bg-[#0c1430] border-[#2f5fe0]/25'
+                : 'bg-[#0b1226] border-[#1a2547]'
             }`}
           >
             <span className={`text-3xl font-black tabular-nums w-10 text-center ${isLeader ? 'text-[#2f5fe0]' : 'text-zinc-600'}`}>
@@ -177,9 +174,9 @@ function SplitBoard({ event, entries }: { event: RiseEvent; entries: RiseEntry[]
 function GenderColumn({ title, event, entries }: { title: string; event: RiseEvent; entries: RiseEntry[] }) {
   const ranked = rankEntries(entries, event.scoring_mode)
   return (
-    <div className="bg-[#0e1838] border border-[#243668] rounded-2xl overflow-hidden transition-colors hover:border-[#2f5fe0]/40">
-      <div className="bg-gradient-to-r from-[#2348b8] via-[#2f5fe0] to-[#4d7bff] px-4 py-3 text-center">
-        <span className="font-black text-white tracking-[0.2em] uppercase drop-shadow">{title}</span>
+    <div className="bg-[#0b1226] border border-[#1a2547] rounded-2xl overflow-hidden">
+      <div className="bg-[#2f5fe0] px-4 py-3 text-center">
+        <span className="font-black text-white tracking-[0.2em] uppercase">{title}</span>
       </div>
       {ranked.length === 0 ? (
         <Empty message="No athletes yet." />
@@ -205,7 +202,7 @@ function Row({ entry, rank, event }: { entry: RiseEntry; rank: number; event: Ri
   const rankDisplay = hasResult ? medals[rank - 1] ?? String(rank) : '—'
 
   return (
-    <li className={`flex items-center gap-3 px-4 py-3.5 border-b border-[#1b2a54] last:border-0 transition-colors hover:bg-[#2f5fe0]/[0.07] ${entry.timer_running ? 'bg-[#2f5fe0]/10 shadow-[inset_3px_0_0_0_#2f5fe0]' : ''}`}>
+    <li className={`flex items-center gap-3 px-4 py-3.5 border-b border-[#141d3a] last:border-0 ${entry.timer_running ? 'bg-[#2f5fe0]/10' : ''}`}>
       <span className="w-7 text-center text-sm tabular-nums">{rankDisplay}</span>
       <span className="flex-1 min-w-0 font-semibold truncate">{entry.competitor?.name ?? '—'}</span>
       <span className="font-black text-lg tabular-nums text-[#2f5fe0]">
