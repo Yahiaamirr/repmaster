@@ -37,14 +37,14 @@ export function RiseRegisterForm({ eventId, eventName }: { eventId: string; even
   if (status === 'done') {
     return (
       <div className="flex flex-col items-center text-center">
-        <CheckCircle2 size={64} className="text-[#4d7bff] mb-5" />
+        <CheckCircle2 size={64} className="text-[var(--brand-text,#4d7bff)] mb-5" />
         <h2 className="text-2xl font-black text-white">You’re in!</h2>
         <p className="text-zinc-400 text-sm mt-2 max-w-xs">
           <span className="text-white font-semibold">{name.trim()}</span> is registered for {eventName}.
         </p>
         <button
           onClick={() => { setName(''); setGender(null); setStatus('idle') }}
-          className="mt-8 text-sm text-[#4d7bff] font-semibold"
+          className="mt-8 text-sm text-[var(--brand-text,#4d7bff)] font-semibold"
         >
           Register another athlete
         </button>
@@ -60,7 +60,7 @@ export function RiseRegisterForm({ eventId, eventName }: { eventId: string; even
         value={name}
         onChange={e => setName(e.target.value)}
         placeholder="Your name"
-        className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-lg outline-none focus:border-[#2f5fe0]"
+        className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-lg outline-none focus:border-[var(--brand,#2f5fe0)]"
       />
 
       <label className="block text-xs text-zinc-500 uppercase tracking-widest mt-5 mb-2">Category</label>
@@ -72,7 +72,7 @@ export function RiseRegisterForm({ eventId, eventName }: { eventId: string; even
             onClick={() => setGender(g)}
             className={`py-4 rounded-2xl font-black text-lg uppercase tracking-wider transition-colors border ${
               gender === g
-                ? 'bg-[#2f5fe0] border-[#2f5fe0] text-white'
+                ? 'bg-[var(--brand,#2f5fe0)] border-[var(--brand,#2f5fe0)] text-[var(--brand-contrast,#fff)]'
                 : 'bg-zinc-900 border-zinc-800 text-zinc-400'
             }`}
           >
@@ -86,7 +86,7 @@ export function RiseRegisterForm({ eventId, eventName }: { eventId: string; even
       <button
         type="submit"
         disabled={!name.trim() || !gender || status === 'submitting'}
-        className="mt-7 w-full py-4 bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-40 text-white font-black text-lg rounded-2xl transition-colors flex items-center justify-center gap-2"
+        className="mt-7 w-full py-4 bg-[var(--brand,#2f5fe0)] active:bg-[var(--brand-press,#2348b8)] disabled:opacity-40 text-[var(--brand-contrast,#fff)] font-black text-lg rounded-2xl transition-colors flex items-center justify-center gap-2"
       >
         {status === 'submitting' ? <Loader2 size={20} className="animate-spin" /> : null}
         Register

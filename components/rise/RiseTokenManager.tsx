@@ -138,7 +138,7 @@ export function RiseTokenManager({
           <button
             onClick={generateTeamTokens}
             disabled={busy}
-            className="flex items-center gap-1.5 text-xs px-3 py-2 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white rounded-md font-semibold transition-colors"
+            className="flex items-center gap-1.5 text-xs px-3 py-2 bg-[var(--brand,#2f5fe0)] hover:bg-[var(--brand-press,#2348b8)] disabled:opacity-50 text-[var(--brand-contrast,#fff)] rounded-md font-semibold transition-colors"
           >
             <Plus size={14} /> One link per team
           </button>
@@ -146,7 +146,7 @@ export function RiseTokenManager({
           <select
             value={teamId}
             onChange={e => setTeamId(e.target.value)}
-            className="text-xs bg-zinc-800 border border-zinc-700 rounded-md px-2 py-2 text-white outline-none focus:border-[#2f5fe0]"
+            className="text-xs bg-zinc-800 border border-zinc-700 rounded-md px-2 py-2 text-white outline-none focus:border-[var(--brand,#2f5fe0)]"
           >
             {teams.map(t => (
               <option key={t.id} value={t.id}>{t.name}</option>
@@ -164,7 +164,7 @@ export function RiseTokenManager({
         <button
           onClick={addStationToken}
           disabled={busy}
-          className="flex items-center gap-1.5 text-xs px-3 py-2 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white rounded-md font-semibold transition-colors mb-4"
+          className="flex items-center gap-1.5 text-xs px-3 py-2 bg-[var(--brand,#2f5fe0)] hover:bg-[var(--brand-press,#2348b8)] disabled:opacity-50 text-[var(--brand-contrast,#fff)] rounded-md font-semibold transition-colors mb-4"
         >
           <Plus size={14} /> Add judge station
         </button>

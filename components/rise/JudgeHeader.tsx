@@ -27,13 +27,13 @@ export function JudgeHeader({
         )}
         <div className="min-w-0">
           <p className="text-xs text-zinc-500 font-mono flex items-center gap-1.5 truncate">
-            <Radio size={9} className="text-[#2f5fe0] animate-pulse shrink-0" />
+            <Radio size={9} className="text-[var(--brand-text,#2f5fe0)] animate-pulse shrink-0" />
             {eventName}
           </p>
           <p className="text-sm font-bold text-white truncate">{label}</p>
         </div>
       </div>
-      {right && <span className="text-[10px] font-bold tracking-widest text-[#2f5fe0] uppercase shrink-0">{right}</span>}
+      {right && <span className="text-[10px] font-bold tracking-widest text-[var(--brand-text,#2f5fe0)] uppercase shrink-0">{right}</span>}
     </div>
   )
 }

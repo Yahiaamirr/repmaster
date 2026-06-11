@@ -22,11 +22,11 @@ export function RiseRegisterQR({ slug }: { slug: string }) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="rounded-2xl bg-[#2f5fe0]/10 border border-[#2f5fe0]/30 p-4">
+      <div className="rounded-2xl bg-[var(--brand,#2f5fe0)]/10 border border-[var(--brand,#2f5fe0)]/30 p-4">
         <QRCodeDisplay url={link} label={`${slug}-register`} />
       </div>
       <div className="flex items-center gap-2">
-        <button onClick={copy} className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-[#2f5fe0] hover:bg-[#2348b8] text-white rounded-md font-semibold transition-colors">
+        <button onClick={copy} className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-[var(--brand,#2f5fe0)] hover:bg-[var(--brand-press,#2348b8)] text-[var(--brand-contrast,#fff)] rounded-md font-semibold transition-colors">
           {copied ? <Check size={13} /> : <Copy size={13} />}
           {copied ? 'Copied' : 'Copy link'}
         </button>

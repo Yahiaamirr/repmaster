@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { adjustCounter, setPhase } from '@/lib/rise'
 import type { RiseEntry, RiseEvent } from '@/types/rise'
 import { JudgeHeader } from './JudgeHeader'
+import { brandVars } from '@/lib/rise-theme'
 
 export function JudgeCounter({
   event,
@@ -57,7 +58,7 @@ export function JudgeCounter({
   const phaseLabel = entry.phase === 'amrap' ? 'AMRAP' : event.unit.toUpperCase()
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none touch-none">
+    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none touch-none" style={brandVars(event.slug)}>
       <JudgeHeader eventName={event.name} label={label} right={phaseLabel} onBack={onBack} />
 
       {/* Live count */}
@@ -80,7 +81,7 @@ export function JudgeCounter({
         <button
           onClick={() => bump(1)}
           disabled={busy}
-          className="flex-[2] flex items-center justify-center bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-60 text-white"
+          className="flex-[2] flex items-center justify-center bg-[var(--brand,#2f5fe0)] active:bg-[var(--brand-press,#2348b8)] disabled:opacity-60 text-[var(--brand-contrast,#fff)]"
         >
           <Plus size={96} strokeWidth={3} />
         </button>
@@ -112,14 +113,14 @@ function ChipperView({
               className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-5"
             >
               <span className="text-xl font-bold text-white">{name}</span>
-              <span className="text-4xl font-black text-[#2f5fe0] tabular-nums">{n}</span>
+              <span className="text-4xl font-black text-[var(--brand-text,#2f5fe0)] tabular-nums">{n}</span>
             </div>
           ))}
       </div>
 
       <button
         onClick={onStartAmrap}
-        className="mt-6 w-full py-6 bg-[#2f5fe0] active:bg-[#2348b8] text-white font-black text-2xl rounded-2xl tracking-wide"
+        className="mt-6 w-full py-6 bg-[var(--brand,#2f5fe0)] active:bg-[var(--brand-press,#2348b8)] text-[var(--brand-contrast,#fff)] font-black text-2xl rounded-2xl tracking-wide"
       >
         START AMRAP →
       </button>

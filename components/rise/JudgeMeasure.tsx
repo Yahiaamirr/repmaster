@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { setMeasure } from '@/lib/rise'
 import type { RiseEntry, RiseEvent } from '@/types/rise'
 import { JudgeHeader } from './JudgeHeader'
+import { brandVars } from '@/lib/rise-theme'
 
 export function JudgeMeasure({
   event,
@@ -40,7 +41,7 @@ export function JudgeMeasure({
   }
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none">
+    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none" style={brandVars(event.slug)}>
       <JudgeHeader eventName={event.name} label={label} right="Highest wins" onBack={onBack} />
 
       {/* Value */}
@@ -69,7 +70,7 @@ export function JudgeMeasure({
         <button
           onClick={save}
           disabled={busy || saved}
-          className="w-full h-20 flex items-center justify-center gap-3 bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-40 text-white font-black text-2xl rounded-3xl transition-colors"
+          className="w-full h-20 flex items-center justify-center gap-3 bg-[var(--brand,#2f5fe0)] active:bg-[var(--brand-press,#2348b8)] disabled:opacity-40 text-[var(--brand-contrast,#fff)] font-black text-2xl rounded-3xl transition-colors"
         >
           <Check size={28} strokeWidth={3} />
           {saved ? 'SAVED' : 'SAVE RESULT'}
@@ -95,7 +96,7 @@ function StepButton({
       onClick={onClick}
       className={`h-20 flex items-center justify-center gap-2 rounded-2xl font-black text-2xl transition-colors ${
         accent
-          ? 'bg-[#2f5fe0]/15 text-[#2f5fe0] border border-[#2f5fe0]/30 active:bg-[#2f5fe0]/25'
+          ? 'bg-[var(--brand,#2f5fe0)]/15 text-[var(--brand-text,#2f5fe0)] border border-[var(--brand,#2f5fe0)]/30 active:bg-[var(--brand,#2f5fe0)]/25'
           : 'bg-zinc-900 text-zinc-300 border border-zinc-800 active:bg-zinc-800'
       }`}
     >

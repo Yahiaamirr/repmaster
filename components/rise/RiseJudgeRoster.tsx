@@ -9,6 +9,7 @@ import type { RiseCompetitor, RiseEntry, RiseEvent, RiseGender } from '@/types/r
 import { JudgeCounter } from './JudgeCounter'
 import { JudgeTimer } from './JudgeTimer'
 import { JudgeMeasure } from './JudgeMeasure'
+import { brandVars } from '@/lib/rise-theme'
 
 export function RiseJudgeRoster({
   event,
@@ -88,7 +89,7 @@ export function RiseJudgeRoster({
 
   // ── Roster list ──
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none">
+    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none" style={brandVars(event.slug)}>
       <div className="px-4 pt-4 pb-3 border-b border-zinc-900">
         <p className="text-xs text-zinc-500 font-mono">{event.name}</p>
         <p className="text-sm font-bold text-white">{label}</p>
@@ -107,7 +108,7 @@ export function RiseJudgeRoster({
               key={g}
               onClick={() => setGender(g)}
               className={`flex-1 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
-                gender === g ? 'bg-[#2f5fe0] text-white' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
+                gender === g ? 'bg-[var(--brand,#2f5fe0)] text-[var(--brand-contrast,#fff)]' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
               }`}
             >
               {g === 'all' ? 'All' : g === 'M' ? 'Men' : 'Women'}

@@ -7,7 +7,8 @@ import { createClient } from '@/lib/supabase/client'
 import type { RiseCompetitor, RiseEntry, RiseEvent } from '@/types/rise'
 import { RiseJudgeClient } from './RiseJudgeClient'
 import { RiseJudgeRoster } from './RiseJudgeRoster'
-import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG } from './RiseBrand'
+import { brandVars } from '@/lib/rise-theme'
+import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG } from './RiseBrand'
 
 interface PresenceMeta {
   clientId: string
@@ -117,17 +118,35 @@ export function RiseJudge({
   // ── Name entry ──
   if (!name) {
     return (
-      <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center">
+      <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center" style={brandVars(event.slug)}>
         <div className="flex items-center gap-3 mb-2">
           <RiseWordmark className="h-9 w-auto" />
           {event.slug === RLNTLSS_SLUG && (
             <>
               <span className="text-zinc-700 text-sm">×</span>
-              <RlntlssMark className="h-10 w-auto" />
+              <RlntlssMark className="h-13 w-auto" />
+            </>
+          )}
+          {event.slug === EVOLVE_SLUG && (
+            <>
+              <span className="text-zinc-700 text-sm">×</span>
+              <EvolveMark className="h-10 w-auto" />
+            </>
+          )}
+          {event.slug === TURBO_SLUG && (
+            <>
+              <span className="text-zinc-700 text-sm">×</span>
+              <TurboMark className="h-17 w-auto" />
+            </>
+          )}
+          {event.slug === LFTD_SLUG && (
+            <>
+              <span className="text-zinc-700 text-sm">×</span>
+              <LftdMark className="h-11 w-auto" />
             </>
           )}
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-[#4d7bff] mb-8 font-mono">
+        <div className="flex items-center gap-1.5 text-xs text-[var(--brand-text,#4d7bff)] mb-8 font-mono">
           <Radio size={10} className="animate-pulse" /> {event.name}
         </div>
         <UserRound size={44} className="text-zinc-700 mb-5" />
@@ -139,12 +158,12 @@ export function RiseJudge({
             value={draft}
             onChange={e => setDraft(e.target.value)}
             placeholder="Your name"
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-lg text-center outline-none focus:border-[#2f5fe0]"
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-lg text-center outline-none focus:border-[var(--brand,#2f5fe0)]"
           />
           <button
             type="submit"
             disabled={!draft.trim()}
-            className="mt-3 w-full py-4 bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-40 text-white font-black text-lg rounded-2xl transition-colors"
+            className="mt-3 w-full py-4 bg-[var(--brand,#2f5fe0)] active:bg-[var(--brand-press,#2348b8)] disabled:opacity-40 text-[var(--brand-contrast,#fff)] font-black text-lg rounded-2xl transition-colors"
           >
             Start judging
           </button>
@@ -168,9 +187,9 @@ export function RiseJudge({
   // ── Locked by another device ──
   if (!isOwner) {
     return (
-      <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center select-none">
+      <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center select-none" style={brandVars(event.slug)}>
         <div className="flex items-center gap-1.5 text-xs text-zinc-500 mb-8 font-mono">{event.name}</div>
-        <Lock size={48} className="text-[#2f5fe0] mb-6" />
+        <Lock size={48} className="text-[var(--brand-text,#2f5fe0)] mb-6" />
         <h1 className="text-2xl font-black text-white mb-2">Open on another device</h1>
         <p className="text-zinc-400 text-sm max-w-xs mb-1">
           This judge link is currently active as <span className="text-white font-bold">{owner.name || 'another judge'}</span>.

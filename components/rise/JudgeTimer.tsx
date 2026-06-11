@@ -7,6 +7,7 @@ import { timerStart, timerStop } from '@/lib/rise'
 import { formatMs } from '@/types/rise'
 import type { RiseEntry, RiseEvent } from '@/types/rise'
 import { JudgeHeader } from './JudgeHeader'
+import { brandVars } from '@/lib/rise-theme'
 
 export function JudgeTimer({
   event,
@@ -74,14 +75,14 @@ export function JudgeTimer({
   const finished = !running && entry.time_ms != null
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none">
+    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col select-none" style={brandVars(event.slug)}>
       <JudgeHeader eventName={event.name} label={label} right={goalWord} onBack={onBack} />
 
       {/* Clock */}
       <div className="flex-1 flex flex-col items-center justify-center">
         <p
           className={`text-[18vw] sm:text-[120px] leading-none font-black tabular-nums tracking-tight ${
-            running ? 'text-white' : finished ? 'text-[#2f5fe0]' : 'text-zinc-600'
+            running ? 'text-white' : finished ? 'text-[var(--brand-text,#2f5fe0)]' : 'text-zinc-600'
           }`}
         >
           {formatMs(running ? displayMs : entry.time_ms ?? 0)}
@@ -98,7 +99,7 @@ export function JudgeTimer({
             <button
               onClick={start}
               disabled={busy}
-              className="w-full h-32 flex items-center justify-center gap-4 bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-60 text-white font-black text-3xl rounded-3xl transition-colors"
+              className="w-full h-32 flex items-center justify-center gap-4 bg-[var(--brand,#2f5fe0)] active:bg-[var(--brand-press,#2348b8)] disabled:opacity-60 text-[var(--brand-contrast,#fff)] font-black text-3xl rounded-3xl transition-colors"
             >
               <Play size={40} fill="currentColor" />
               {finished ? 'RESTART' : 'START'}

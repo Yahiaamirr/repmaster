@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Radio, Settings, ExternalLink, Users, User } from 'lucide-react'
+import { Radio, Settings, ExternalLink, Users, User, Plus } from 'lucide-react'
 import type { RiseEvent } from '@/types/rise'
 import { RiseWordmark } from '@/components/rise/RiseBrand'
 
@@ -35,15 +35,29 @@ export default async function AdminRisePage() {
             Five live events. Open a control room to run scoring, and share the public leaderboard.
           </p>
         </div>
+        <Link
+          href="/admin/rise/new"
+          className="ml-auto flex items-center gap-2 px-4 py-2 bg-[#2f5fe0] hover:bg-[#2348b8] text-white font-semibold rounded-lg transition-colors text-sm"
+        >
+          <Plus size={15} />
+          New Event
+        </Link>
       </div>
 
       {list.length === 0 ? (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center">
           <p className="text-zinc-300 font-semibold">No RISE events found.</p>
           <p className="text-zinc-500 text-sm mt-2">
-            Run <code className="text-[#2f5fe0]">002_rise.sql</code>, <code className="text-[#2f5fe0]">003_rise_seed.sql</code>{' '}
+            Create one below, or run <code className="text-[#2f5fe0]">002_rise.sql</code>, <code className="text-[#2f5fe0]">003_rise_seed.sql</code>{' '}
             and <code className="text-[#2f5fe0]">004_rise_participants.sql</code> in the Supabase SQL editor.
           </p>
+          <Link
+            href="/admin/rise/new"
+            className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 bg-[#2f5fe0] hover:bg-[#2348b8] text-white font-semibold rounded-lg transition-colors text-sm"
+          >
+            <Plus size={15} />
+            New Event
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

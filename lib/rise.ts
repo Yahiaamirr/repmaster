@@ -3,7 +3,7 @@ import type { RiseEntry } from '@/types/rise'
 
 // Columns to select for an entry plus its joined competitor/team.
 export const ENTRY_SELECT =
-  '*, competitor:rise_competitors(id, name, team_id, display_order), team:rise_teams(id, name, display_order)'
+  '*, competitor:rise_competitors(id, name, gender, team_id, display_order), team:rise_teams(id, name, display_order)'
 
 // ── Judge mutations ──────────────────────────────────────────
 

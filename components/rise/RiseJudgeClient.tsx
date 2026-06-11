@@ -5,6 +5,7 @@ import { Clock, Radio } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { fetchScopedEntries, pickActiveEntry } from '@/lib/rise'
 import type { RiseEntry, RiseEvent } from '@/types/rise'
+import { brandVars } from '@/lib/rise-theme'
 import { JudgeCounter } from './JudgeCounter'
 import { JudgeTimer } from './JudgeTimer'
 import { JudgeMeasure } from './JudgeMeasure'
@@ -59,8 +60,8 @@ export function RiseJudgeClient({
 
 function WaitingState({ event, label }: { event: RiseEvent; label: string }) {
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center text-center px-8 select-none">
-      <div className="flex items-center gap-1.5 text-xs text-[#2f5fe0] mb-8">
+    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center text-center px-8 select-none" style={brandVars(event.slug)}>
+      <div className="flex items-center gap-1.5 text-xs text-[var(--brand-text,#2f5fe0)] mb-8">
         <Radio size={10} className="animate-pulse" />
         <span className="font-mono">{event.name}</span>
       </div>

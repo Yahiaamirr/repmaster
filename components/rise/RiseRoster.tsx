@@ -76,13 +76,13 @@ export function RiseRoster({
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Athlete name"
-          className="flex-1 min-w-[150px] bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#2f5fe0]"
+          className="flex-1 min-w-[150px] bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[var(--brand,#2f5fe0)]"
         />
         <GenderToggle value={gender} onChange={setGender} />
         <button
           type="submit"
           disabled={!name.trim() || adding}
-          className="flex items-center gap-1.5 px-3 py-2 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2 bg-[var(--brand,#2f5fe0)] hover:bg-[var(--brand-press,#2348b8)] disabled:opacity-50 text-[var(--brand-contrast,#fff)] text-sm font-semibold rounded-lg transition-colors"
         >
           {adding ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
           Add
@@ -92,9 +92,9 @@ export function RiseRoster({
       {/* Count + search */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <span className="text-xs text-zinc-500">
-          <span className="text-[#4d7bff] font-bold">{list.length}</span> total ·{' '}
-          <span className="text-[#4d7bff] font-bold">{men}</span> men ·{' '}
-          <span className="text-[#4d7bff] font-bold">{women}</span> women
+          <span className="text-[var(--brand-text,#4d7bff)] font-bold">{list.length}</span> total ·{' '}
+          <span className="text-[var(--brand-text,#4d7bff)] font-bold">{men}</span> men ·{' '}
+          <span className="text-[var(--brand-text,#4d7bff)] font-bold">{women}</span> women
         </span>
         {list.length > 6 && (
           <div className="flex items-center gap-1.5 rounded-lg bg-zinc-800 border border-zinc-700 px-2">
@@ -122,7 +122,7 @@ export function RiseRoster({
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') saveEdit(c.id); if (e.key === 'Escape') setEditId(null) }}
-                    className="flex-1 min-w-0 bg-zinc-800 border border-[#2f5fe0]/50 rounded px-2 py-1 text-sm text-white outline-none"
+                    className="flex-1 min-w-0 bg-zinc-800 border border-[var(--brand,#2f5fe0)]/50 rounded px-2 py-1 text-sm text-white outline-none"
                   />
                   <GenderToggle value={editGender} onChange={setEditGender} small />
                   <button onClick={() => saveEdit(c.id)} className="p-1.5 text-green-400 hover:bg-zinc-700 rounded" title="Save"><Check size={15} /></button>
@@ -130,9 +130,9 @@ export function RiseRoster({
                 </>
               ) : (
                 <>
-                  <span className={`text-[10px] font-bold w-4 ${c.gender === 'F' ? 'text-pink-400' : 'text-[#4d7bff]'}`}>{c.gender}</span>
+                  <span className={`text-[10px] font-bold w-4 ${c.gender === 'F' ? 'text-pink-400' : 'text-[var(--brand-text,#4d7bff)]'}`}>{c.gender}</span>
                   <span className="flex-1 min-w-0 text-sm text-zinc-200 truncate">{c.name}</span>
-                  <button onClick={() => startEdit(c)} className="p-1.5 text-zinc-500 hover:text-[#4d7bff] opacity-0 group-hover:opacity-100 transition-opacity" title="Edit"><Pencil size={14} /></button>
+                  <button onClick={() => startEdit(c)} className="p-1.5 text-zinc-500 hover:text-[var(--brand-text,#4d7bff)] opacity-0 group-hover:opacity-100 transition-opacity" title="Edit"><Pencil size={14} /></button>
                   <button onClick={() => remove(c)} className="p-1.5 text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove"><Trash2 size={14} /></button>
                 </>
               )}
@@ -153,7 +153,7 @@ function GenderToggle({ value, onChange, small }: { value: RiseGender; onChange:
           type="button"
           onClick={() => onChange(g)}
           className={`${small ? 'px-2 py-1 text-[10px]' : 'px-3 py-2 text-xs'} font-bold uppercase transition-colors ${
-            value === g ? 'bg-[#2f5fe0] text-white' : 'bg-zinc-800 text-zinc-400'
+            value === g ? 'bg-[var(--brand,#2f5fe0)] text-[var(--brand-contrast,#fff)]' : 'bg-zinc-800 text-zinc-400'
           }`}
         >
           {g === 'M' ? 'M' : 'F'}
