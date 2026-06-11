@@ -80,7 +80,7 @@ export function JudgeCounter({
         <button
           onClick={() => bump(1)}
           disabled={busy}
-          className="flex-[2] flex items-center justify-center bg-[#e8440a] active:bg-[#c63808] disabled:opacity-60 text-white"
+          className="flex-[2] flex items-center justify-center bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-60 text-white"
         >
           <Plus size={96} strokeWidth={3} />
         </button>
@@ -112,14 +112,14 @@ function ChipperView({
               className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-5"
             >
               <span className="text-xl font-bold text-white">{name}</span>
-              <span className="text-4xl font-black text-[#e8440a] tabular-nums">{n}</span>
+              <span className="text-4xl font-black text-[#2f5fe0] tabular-nums">{n}</span>
             </div>
           ))}
       </div>
 
       <button
         onClick={onStartAmrap}
-        className="mt-6 w-full py-6 bg-[#e8440a] active:bg-[#c63808] text-white font-black text-2xl rounded-2xl tracking-wide"
+        className="mt-6 w-full py-6 bg-[#2f5fe0] active:bg-[#2348b8] text-white font-black text-2xl rounded-2xl tracking-wide"
       >
         START AMRAP →
       </button>

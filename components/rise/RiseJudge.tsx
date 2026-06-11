@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { RiseCompetitor, RiseEntry, RiseEvent } from '@/types/rise'
 import { RiseJudgeClient } from './RiseJudgeClient'
 import { RiseJudgeRoster } from './RiseJudgeRoster'
+import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG } from './RiseBrand'
 
 interface PresenceMeta {
   clientId: string
@@ -117,7 +118,16 @@ export function RiseJudge({
   if (!name) {
     return (
       <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center">
-        <div className="flex items-center gap-1.5 text-xs text-[#e8440a] mb-8 font-mono">
+        <div className="flex items-center gap-3 mb-2">
+          <RiseWordmark className="h-9 w-auto" />
+          {event.slug === RLNTLSS_SLUG && (
+            <>
+              <span className="text-zinc-700 text-sm">×</span>
+              <RlntlssMark className="h-10 w-auto" />
+            </>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-[#4d7bff] mb-8 font-mono">
           <Radio size={10} className="animate-pulse" /> {event.name}
         </div>
         <UserRound size={44} className="text-zinc-700 mb-5" />
@@ -129,12 +139,12 @@ export function RiseJudge({
             value={draft}
             onChange={e => setDraft(e.target.value)}
             placeholder="Your name"
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-lg text-center outline-none focus:border-[#e8440a]"
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-lg text-center outline-none focus:border-[#2f5fe0]"
           />
           <button
             type="submit"
             disabled={!draft.trim()}
-            className="mt-3 w-full py-4 bg-[#e8440a] active:bg-[#c63808] disabled:opacity-40 text-white font-black text-lg rounded-2xl transition-colors"
+            className="mt-3 w-full py-4 bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-40 text-white font-black text-lg rounded-2xl transition-colors"
           >
             Start judging
           </button>
@@ -160,7 +170,7 @@ export function RiseJudge({
     return (
       <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center px-8 text-center select-none">
         <div className="flex items-center gap-1.5 text-xs text-zinc-500 mb-8 font-mono">{event.name}</div>
-        <Lock size={48} className="text-[#e8440a] mb-6" />
+        <Lock size={48} className="text-[#2f5fe0] mb-6" />
         <h1 className="text-2xl font-black text-white mb-2">Open on another device</h1>
         <p className="text-zinc-400 text-sm max-w-xs mb-1">
           This judge link is currently active as <span className="text-white font-bold">{owner.name || 'another judge'}</span>.

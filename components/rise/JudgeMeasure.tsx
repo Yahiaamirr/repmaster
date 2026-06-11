@@ -69,7 +69,7 @@ export function JudgeMeasure({
         <button
           onClick={save}
           disabled={busy || saved}
-          className="w-full h-20 flex items-center justify-center gap-3 bg-[#e8440a] active:bg-[#c63808] disabled:opacity-40 text-white font-black text-2xl rounded-3xl transition-colors"
+          className="w-full h-20 flex items-center justify-center gap-3 bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-40 text-white font-black text-2xl rounded-3xl transition-colors"
         >
           <Check size={28} strokeWidth={3} />
           {saved ? 'SAVED' : 'SAVE RESULT'}
@@ -95,7 +95,7 @@ function StepButton({
       onClick={onClick}
       className={`h-20 flex items-center justify-center gap-2 rounded-2xl font-black text-2xl transition-colors ${
         accent
-          ? 'bg-[#e8440a]/15 text-[#e8440a] border border-[#e8440a]/30 active:bg-[#e8440a]/25'
+          ? 'bg-[#2f5fe0]/15 text-[#2f5fe0] border border-[#2f5fe0]/30 active:bg-[#2f5fe0]/25'
           : 'bg-zinc-900 text-zinc-300 border border-zinc-800 active:bg-zinc-800'
       }`}
     >

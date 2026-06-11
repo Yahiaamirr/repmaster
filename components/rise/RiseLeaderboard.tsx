@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT } from '@/lib/rise'
 import { rankEntries, entryValue, formatMs } from '@/types/rise'
 import type { RiseEntry, RiseEvent, RiseRound, RiseTeam, RiseGender } from '@/types/rise'
+import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG } from './RiseBrand'
 
 export function RiseLeaderboard({
   event,
@@ -43,7 +44,7 @@ export function RiseLeaderboard({
     null
 
   return (
-    <div className="min-h-[100dvh] bg-[#0d0800] text-white">
+    <div className="min-h-[100dvh] bg-[#05070f] text-white">
       <Header event={event} roundName={event.is_team ? activeRound?.name ?? null : null} />
       <div className="px-4 pb-16 max-w-6xl mx-auto">
         {event.is_team ? (
@@ -57,16 +58,29 @@ export function RiseLeaderboard({
 }
 
 function Header({ event, roundName }: { event: RiseEvent; roundName: string | null }) {
+  const isRlntlss = event.slug === RLNTLSS_SLUG
   return (
-    <header className="text-center py-8 px-4 border-b border-[#2a1a00]">
-      <div className="inline-flex items-center gap-2 text-[#e8440a] text-xs font-bold tracking-[4px] uppercase mb-4">
-        <span className="w-1.5 h-1.5 bg-[#e8440a] rounded-full animate-pulse" />
-        Live
+    <header className="relative text-center py-9 px-4 border-b border-[#1a2547] overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(47,95,224,0.2),transparent_60%)]" />
+      <div className="relative">
+        <div className="flex items-center justify-center gap-4 mb-5">
+          <RiseWordmark className="h-8 sm:h-10 w-auto" />
+          {isRlntlss && (
+            <>
+              <span className="text-zinc-700 text-sm">×</span>
+              <RlntlssMark className="h-10 sm:h-12 w-auto" />
+            </>
+          )}
+        </div>
+        <div className="inline-flex items-center gap-2 text-[#4d7bff] text-xs font-bold tracking-[4px] uppercase mb-3">
+          <span className="w-1.5 h-1.5 bg-[#4d7bff] rounded-full animate-pulse" />
+          Live
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight">{event.name}</h1>
+        {roundName && (
+          <p className="text-zinc-400 text-sm mt-3 uppercase tracking-[0.3em]">{roundName}</p>
+        )}
       </div>
-      <h1 className="text-3xl sm:text-5xl font-black tracking-tight">{event.name}</h1>
-      {roundName && (
-        <p className="text-zinc-400 text-sm mt-3 uppercase tracking-[0.3em]">{roundName}</p>
-      )}
     </header>
   )
 }
@@ -110,19 +124,19 @@ function TeamBoard({
             key={row.team.id}
             className={`flex items-center gap-4 rounded-2xl border px-5 py-5 transition-colors ${
               isLeader
-                ? 'bg-[#1a0800] border-[#e8440a]/60'
+                ? 'bg-[#102047] border-[#2f5fe0]/60'
                 : advancing
-                ? 'bg-[#140a00] border-[#e8440a]/25'
-                : 'bg-[#120a00] border-[#2a1200]'
+                ? 'bg-[#0c1430] border-[#2f5fe0]/25'
+                : 'bg-[#0b1226] border-[#1a2547]'
             }`}
           >
-            <span className={`text-3xl font-black tabular-nums w-10 text-center ${isLeader ? 'text-[#e8440a]' : 'text-zinc-600'}`}>
+            <span className={`text-3xl font-black tabular-nums w-10 text-center ${isLeader ? 'text-[#2f5fe0]' : 'text-zinc-600'}`}>
               {i + 1}
             </span>
             <div className="flex-1 min-w-0">
               <p className="text-xl sm:text-2xl font-black truncate">{row.team.name}</p>
               {advancing && (
-                <span className="text-[10px] font-bold tracking-widest text-[#e8440a] uppercase">
+                <span className="text-[10px] font-bold tracking-widest text-[#2f5fe0] uppercase">
                   ▲ Qualifying
                 </span>
               )}
@@ -133,7 +147,7 @@ function TeamBoard({
                 <span className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">AMRAP</span>
               )}
             </div>
-            <span className={`text-5xl sm:text-6xl font-black tabular-nums ${isLeader ? 'text-[#e8440a]' : 'text-white'}`}>
+            <span className={`text-5xl sm:text-6xl font-black tabular-nums ${isLeader ? 'text-[#2f5fe0]' : 'text-white'}`}>
               {row.counter}
             </span>
           </div>
@@ -160,8 +174,8 @@ function SplitBoard({ event, entries }: { event: RiseEvent; entries: RiseEntry[]
 function GenderColumn({ title, event, entries }: { title: string; event: RiseEvent; entries: RiseEntry[] }) {
   const ranked = rankEntries(entries, event.scoring_mode)
   return (
-    <div className="bg-[#120a00] border border-[#2a1200] rounded-2xl overflow-hidden">
-      <div className="bg-[#e8440a] px-4 py-3 text-center">
+    <div className="bg-[#0b1226] border border-[#1a2547] rounded-2xl overflow-hidden">
+      <div className="bg-[#2f5fe0] px-4 py-3 text-center">
         <span className="font-black text-white tracking-[0.2em] uppercase">{title}</span>
       </div>
       {ranked.length === 0 ? (
@@ -188,10 +202,10 @@ function Row({ entry, rank, event }: { entry: RiseEntry; rank: number; event: Ri
   const rankDisplay = hasResult ? medals[rank - 1] ?? String(rank) : '—'
 
   return (
-    <li className={`flex items-center gap-3 px-4 py-3.5 border-b border-[#1a0e00] last:border-0 ${entry.timer_running ? 'bg-[#e8440a]/10' : ''}`}>
+    <li className={`flex items-center gap-3 px-4 py-3.5 border-b border-[#141d3a] last:border-0 ${entry.timer_running ? 'bg-[#2f5fe0]/10' : ''}`}>
       <span className="w-7 text-center text-sm tabular-nums">{rankDisplay}</span>
       <span className="flex-1 min-w-0 font-semibold truncate">{entry.competitor?.name ?? '—'}</span>
-      <span className="font-black text-lg tabular-nums text-[#e8440a]">
+      <span className="font-black text-lg tabular-nums text-[#2f5fe0]">
         {entry.timer_running ? <LiveTimer startedAt={entry.timer_started_at} /> : hasResult ? entryValue(entry, event.scoring_mode, event.unit) : <span className="text-zinc-700">—</span>}
       </span>
     </li>

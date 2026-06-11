@@ -106,7 +106,7 @@ function StatusBar({ event, onSet, onReset, busy }: { event: RiseEvent; onSet: (
             onClick={() => onSet(s)}
             className={`text-xs px-3 py-1.5 rounded-md font-semibold uppercase tracking-wider transition-colors ${
               event.status === s
-                ? s === 'live' ? 'bg-green-500/20 text-green-400 border border-green-500/40' : 'bg-[#e8440a] text-white'
+                ? s === 'live' ? 'bg-green-500/20 text-green-400 border border-green-500/40' : 'bg-[#2f5fe0] text-white'
                 : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
             }`}
           >
@@ -195,7 +195,7 @@ function TeamControl({
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Round Flow</h2>
         <div className="flex flex-wrap gap-3 items-center">
-          <button onClick={startQual} disabled={busy} className="flex items-center gap-2 px-4 py-2.5 bg-[#e8440a] hover:bg-[#c73a08] disabled:opacity-50 text-white rounded-lg font-semibold text-sm transition-colors">
+          <button onClick={startQual} disabled={busy} className="flex items-center gap-2 px-4 py-2.5 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white rounded-lg font-semibold text-sm transition-colors">
             <Play size={16} /> Start Qualification (3:00)
           </button>
           <span className="text-zinc-600">→</span>
@@ -207,7 +207,7 @@ function TeamControl({
                   type="number"
                   value={(chip as any)[k]}
                   onChange={e => setChip({ ...chip, [k]: Number(e.target.value) })}
-                  className="w-14 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-white outline-none focus:border-[#e8440a]"
+                  className="w-14 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-white outline-none focus:border-[#2f5fe0]"
                 />
               </label>
             ))}
@@ -216,7 +216,7 @@ function TeamControl({
             <Flag size={16} /> Advance Top 2 → Final (6:00)
           </button>
         </div>
-        {activeRound && <p className="text-xs text-zinc-500 mt-3">Active round: <span className="text-[#e8440a] font-semibold">{activeRound.name}</span></p>}
+        {activeRound && <p className="text-xs text-zinc-500 mt-3">Active round: <span className="text-[#2f5fe0] font-semibold">{activeRound.name}</span></p>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -224,15 +224,15 @@ function TeamControl({
           <p className="text-zinc-500 text-sm col-span-full text-center py-8">Start a round to create team counters.</p>
         ) : (
           roundEntries.map((e, i) => (
-            <div key={e.id} className={`rounded-xl border p-4 ${i === 0 ? 'border-[#e8440a]/50 bg-[#1a0800]' : 'border-zinc-800 bg-zinc-900'}`}>
+            <div key={e.id} className={`rounded-xl border p-4 ${i === 0 ? 'border-[#2f5fe0]/50 bg-[#102047]' : 'border-zinc-800 bg-zinc-900'}`}>
               <div className="flex items-center justify-between mb-3">
                 <span className="font-bold text-white">{e.team?.name ?? 'Team'}</span>
                 {e.phase && <span className="text-[10px] uppercase tracking-widest text-zinc-500">{e.phase}</span>}
               </div>
               <div className="flex items-center justify-between">
                 <button onClick={() => override(e, -1)} className="h-12 w-12 flex items-center justify-center bg-zinc-800 active:bg-zinc-700 rounded-lg text-white"><Minus size={20} /></button>
-                <span className="text-5xl font-black tabular-nums text-[#e8440a]">{e.counter}</span>
-                <button onClick={() => override(e, 1)} className="h-12 w-12 flex items-center justify-center bg-[#e8440a] active:bg-[#c63808] rounded-lg text-white"><Plus size={20} /></button>
+                <span className="text-5xl font-black tabular-nums text-[#2f5fe0]">{e.counter}</span>
+                <button onClick={() => override(e, 1)} className="h-12 w-12 flex items-center justify-center bg-[#2f5fe0] active:bg-[#2348b8] rounded-lg text-white"><Plus size={20} /></button>
               </div>
             </div>
           ))
@@ -274,7 +274,7 @@ function IndividualControl({
           <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">Scoring</h2>
           <p className="text-xs text-zinc-500 mt-1">Judges score via the judge link. This is the live mirror — clear a result to let an athlete re-attempt.</p>
         </div>
-        <button onClick={addAll} disabled={busy} className="flex items-center gap-2 px-4 py-2.5 bg-[#e8440a] hover:bg-[#c73a08] disabled:opacity-50 text-white rounded-lg font-semibold text-sm transition-colors shrink-0">
+        <button onClick={addAll} disabled={busy} className="flex items-center gap-2 px-4 py-2.5 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white rounded-lg font-semibold text-sm transition-colors shrink-0">
           <ListPlus size={16} /> Add all athletes to board
         </button>
       </div>
@@ -290,7 +290,7 @@ function IndividualControl({
                 <span className="w-6 text-center text-sm text-zinc-500 tabular-nums">{done ? i + 1 : '—'}</span>
                 <span className={`text-[10px] font-bold w-4 ${e.competitor?.gender === 'F' ? 'text-pink-400' : 'text-sky-400'}`}>{e.competitor?.gender}</span>
                 <span className="flex-1 min-w-0 text-white truncate">{e.competitor?.name}</span>
-                <span className="font-black tabular-nums text-[#e8440a]">{done || e.timer_running ? entryValue(e, ev.scoring_mode, ev.unit) : <span className="text-zinc-700">—</span>}</span>
+                <span className="font-black tabular-nums text-[#2f5fe0]">{done || e.timer_running ? entryValue(e, ev.scoring_mode, ev.unit) : <span className="text-zinc-700">—</span>}</span>
                 {done && (
                   <button onClick={() => clearEntry(e)} className="text-zinc-500 hover:text-white p-1" title="Clear result"><RotateCcw size={15} /></button>
                 )}

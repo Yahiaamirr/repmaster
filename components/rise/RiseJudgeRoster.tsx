@@ -107,7 +107,7 @@ export function RiseJudgeRoster({
               key={g}
               onClick={() => setGender(g)}
               className={`flex-1 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
-                gender === g ? 'bg-[#e8440a] text-white' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
+                gender === g ? 'bg-[#2f5fe0] text-white' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
               }`}
             >
               {g === 'all' ? 'All' : g === 'M' ? 'Men' : 'Women'}

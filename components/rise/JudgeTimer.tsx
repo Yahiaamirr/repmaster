@@ -81,7 +81,7 @@ export function JudgeTimer({
       <div className="flex-1 flex flex-col items-center justify-center">
         <p
           className={`text-[18vw] sm:text-[120px] leading-none font-black tabular-nums tracking-tight ${
-            running ? 'text-white' : finished ? 'text-[#e8440a]' : 'text-zinc-600'
+            running ? 'text-white' : finished ? 'text-[#2f5fe0]' : 'text-zinc-600'
           }`}
         >
           {formatMs(running ? displayMs : entry.time_ms ?? 0)}
@@ -98,7 +98,7 @@ export function JudgeTimer({
             <button
               onClick={start}
               disabled={busy}
-              className="w-full h-32 flex items-center justify-center gap-4 bg-[#e8440a] active:bg-[#c63808] disabled:opacity-60 text-white font-black text-3xl rounded-3xl transition-colors"
+              className="w-full h-32 flex items-center justify-center gap-4 bg-[#2f5fe0] active:bg-[#2348b8] disabled:opacity-60 text-white font-black text-3xl rounded-3xl transition-colors"
             >
               <Play size={40} fill="currentColor" />
               {finished ? 'RESTART' : 'START'}

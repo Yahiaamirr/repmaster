@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Radio, Settings, ExternalLink, Users, User } from 'lucide-react'
 import type { RiseEvent } from '@/types/rise'
+import { RiseWordmark } from '@/components/rise/RiseBrand'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,19 +25,24 @@ export default async function AdminRisePage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold flex items-center gap-2">RISE Opening Event</h1>
-        <p className="text-zinc-400 text-sm mt-1">
-          Five live events. Open a control room to run scoring, and share the public leaderboard.
-        </p>
+      <div className="mb-8 flex items-center gap-4">
+        <span className="rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-3">
+          <RiseWordmark className="h-8 w-auto" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold">RISE Opening Event</h1>
+          <p className="text-zinc-400 text-sm mt-0.5">
+            Five live events. Open a control room to run scoring, and share the public leaderboard.
+          </p>
+        </div>
       </div>
 
       {list.length === 0 ? (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center">
           <p className="text-zinc-300 font-semibold">No RISE events found.</p>
           <p className="text-zinc-500 text-sm mt-2">
-            Run <code className="text-[#e8440a]">002_rise.sql</code>, <code className="text-[#e8440a]">003_rise_seed.sql</code>{' '}
-            and <code className="text-[#e8440a]">004_rise_participants.sql</code> in the Supabase SQL editor.
+            Run <code className="text-[#2f5fe0]">002_rise.sql</code>, <code className="text-[#2f5fe0]">003_rise_seed.sql</code>{' '}
+            and <code className="text-[#2f5fe0]">004_rise_participants.sql</code> in the Supabase SQL editor.
           </p>
         </div>
       ) : (
@@ -45,7 +51,7 @@ export default async function AdminRisePage() {
             <div key={ev.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e8440a]/15 text-[#e8440a]">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2f5fe0]/15 text-[#2f5fe0]">
                     {ev.is_team ? <Users size={18} /> : <User size={18} />}
                   </span>
                   <div>
@@ -99,7 +105,7 @@ function CardLink({
   external?: boolean
 }) {
   const cls = `flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors ${
-    highlight ? 'bg-[#e8440a] hover:bg-[#c73a08] text-white' : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200'
+    highlight ? 'bg-[#2f5fe0] hover:bg-[#2348b8] text-white' : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200'
   }`
   if (external) {
     return (
