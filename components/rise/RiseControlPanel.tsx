@@ -1,14 +1,14 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Minus, Plus, Play, Flag, ListPlus, RotateCcw, AlertTriangle, UserCheck, Search } from 'lucide-react'
+import { Minus, Plus, Play, Flag, ListPlus, RotateCcw, AlertTriangle, UserCheck, Search, Save, Pencil } from 'lucide-react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT, adjustCounter } from '@/lib/rise'
-import { rankEntries, entryValue } from '@/types/rise'
+import { rankEntries, entryValue, formatMs } from '@/types/rise'
 import { RiseWaveControl } from './RiseWaveControl'
 import type {
-  RiseCompetitor, RiseEntry, RiseEvent, RiseRound, RiseStatus, RiseTeam,
+  RiseCompetitor, RiseEntry, RiseEvent, RiseRound, RiseScoringMode, RiseStatus, RiseTeam,
 } from '@/types/rise'
 
 export function RiseControlPanel({
@@ -107,6 +107,12 @@ export function RiseControlPanel({
           supabase={supabase}
         />
       )}
+      <ScoreOverridePanel
+        event={event}
+        entries={entries}
+        setEntries={setEntries}
+        supabase={supabase}
+      />
     </div>
   )
 }
@@ -148,6 +154,236 @@ function StatusBar({ event, onSet, onReset, busy }: { event: RiseEvent; onSet: (
 }
 
 // ── RISE (team) control ─────────────────────────────────────
+function ScoreOverridePanel({
+  event, entries, setEntries, supabase,
+}: {
+  event: RiseEvent
+  entries: RiseEntry[]
+  setEntries: (updater: (prev: RiseEntry[]) => RiseEntry[]) => void
+  supabase: SupabaseClient
+}) {
+  const [open, setOpen] = useState(false)
+  const [q, setQ] = useState('')
+  const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [error, setError] = useState<string | null>(null)
+  const [savingId, setSavingId] = useState<string | null>(null)
+
+  const rows = useMemo(() => {
+    const needle = q.trim().toLowerCase()
+    return [...entries]
+      .filter(entry => {
+        const label = entryLabel(entry).toLowerCase()
+        return !needle || label.includes(needle)
+      })
+      .sort((a, b) => entryLabel(a).localeCompare(entryLabel(b)))
+  }, [entries, q])
+
+  function draftFor(entry: RiseEntry) {
+    return drafts[entry.id] ?? overrideInputValue(entry, event.scoring_mode)
+  }
+
+  async function saveOverride(entry: RiseEntry) {
+    setError(null)
+    const parsed = scorePatchFromInput(event.scoring_mode, draftFor(entry))
+    if (!parsed.ok) {
+      setError(parsed.message)
+      return
+    }
+
+    const patch = { ...parsed.patch, updated_at: new Date().toISOString() }
+    setSavingId(entry.id)
+    setEntries(prev => prev.map(e => (e.id === entry.id ? { ...e, ...patch } : e)))
+    const { error: updateError } = await supabase.from('rise_entries').update(patch).eq('id', entry.id)
+    if (updateError) {
+      setError(updateError.message)
+      await refetchEntry(supabase, entry.id, setEntries)
+    } else {
+      setDrafts(prev => {
+        const next = { ...prev }
+        delete next[entry.id]
+        return next
+      })
+    }
+    setSavingId(null)
+  }
+
+  async function clearScore(entry: RiseEntry) {
+    setError(null)
+    const patch = clearPatchForMode(event.scoring_mode)
+    setSavingId(entry.id)
+    setEntries(prev => prev.map(e => (e.id === entry.id ? { ...e, ...patch } : e)))
+    const { error: updateError } = await supabase.from('rise_entries').update(patch).eq('id', entry.id)
+    if (updateError) {
+      setError(updateError.message)
+      await refetchEntry(supabase, entry.id, setEntries)
+    } else {
+      setDrafts(prev => ({ ...prev, [entry.id]: '' }))
+    }
+    setSavingId(null)
+  }
+
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between gap-3 p-4 text-left"
+      >
+        <div className="flex items-center gap-2">
+          <Pencil size={16} className="text-[#4d7bff]" />
+          <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Manual score override</h2>
+        </div>
+        <span className="text-xs text-zinc-500">{open ? 'Hide' : 'Show'}</span>
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+            <p className="text-xs text-zinc-500">
+              Set an exact {scoreLabel(event.scoring_mode)}. Overrides stop running timers and mark the score done.
+            </p>
+            {entries.length > 6 && (
+              <div className="flex items-center gap-2 rounded-lg bg-zinc-800 border border-zinc-700 px-3 sm:w-64">
+                <Search size={15} className="text-zinc-500" />
+                <input
+                  value={q}
+                  onChange={e => setQ(e.target.value)}
+                  placeholder="Search score..."
+                  className="flex-1 bg-transparent py-2 text-sm text-white outline-none placeholder:text-zinc-600"
+                />
+              </div>
+            )}
+          </div>
+
+          {error && (
+            <div className="rounded-lg border border-red-900/60 bg-red-950/40 px-3 py-2 text-xs text-red-300">
+              {error}
+            </div>
+          )}
+
+          {rows.length === 0 ? (
+            <p className="text-zinc-500 text-sm text-center py-6">
+              {entries.length === 0 ? 'No score entries exist yet.' : 'No matching scores.'}
+            </p>
+          ) : (
+            <div className="divide-y divide-zinc-800 rounded-lg border border-zinc-800 overflow-hidden">
+              {rows.map(entry => (
+                <div key={entry.id} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-3 bg-zinc-950/30 px-3 py-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{entryLabel(entry)}</p>
+                    <p className="text-xs text-zinc-500">
+                      Current: <span className="text-zinc-300 tabular-nums">{entryValue(entry, event.scoring_mode, event.unit)}</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      value={draftFor(entry)}
+                      onChange={e => setDrafts(prev => ({ ...prev, [entry.id]: e.target.value }))}
+                      onKeyDown={e => { if (e.key === 'Enter') saveOverride(entry) }}
+                      placeholder={scorePlaceholder(event.scoring_mode)}
+                      inputMode={event.scoring_mode === 'time_fastest' || event.scoring_mode === 'time_longest' ? 'decimal' : 'numeric'}
+                      className="w-28 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white text-right tabular-nums outline-none focus:border-[#2f5fe0]"
+                    />
+                    <button
+                      onClick={() => saveOverride(entry)}
+                      disabled={savingId === entry.id}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white rounded-lg font-semibold text-xs transition-colors"
+                    >
+                      <Save size={14} /> Save
+                    </button>
+                    <button
+                      onClick={() => clearScore(entry)}
+                      disabled={savingId === entry.id}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 rounded-lg font-semibold text-xs transition-colors"
+                    >
+                      <RotateCcw size={14} /> Clear
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function entryLabel(entry: RiseEntry): string {
+  return entry.team?.name ?? entry.competitor?.name ?? 'Unassigned entry'
+}
+
+function scoreLabel(mode: RiseScoringMode): string {
+  if (mode === 'measure_max') return 'measurement'
+  if (mode === 'time_fastest' || mode === 'time_longest') return 'time'
+  return 'rep count'
+}
+
+function scorePlaceholder(mode: RiseScoringMode): string {
+  if (mode === 'measure_max') return '125.5'
+  if (mode === 'time_fastest' || mode === 'time_longest') return '1:23.45'
+  return '42'
+}
+
+function overrideInputValue(entry: RiseEntry, mode: RiseScoringMode): string {
+  if (mode === 'measure_max') return entry.measure_value == null ? '' : String(entry.measure_value)
+  if (mode === 'time_fastest' || mode === 'time_longest') return entry.time_ms == null ? '' : formatMs(entry.time_ms)
+  return entry.counter ? String(entry.counter) : ''
+}
+
+function scorePatchFromInput(mode: RiseScoringMode, input: string):
+  | { ok: true; patch: Partial<RiseEntry> }
+  | { ok: false; message: string } {
+  const raw = input.trim()
+  if (!raw) return { ok: false, message: 'Enter a score before saving.' }
+
+  if (mode === 'time_fastest' || mode === 'time_longest') {
+    const ms = parseTimeInput(raw)
+    if (ms == null) return { ok: false, message: 'Use seconds or m:ss.xx for time overrides.' }
+    return { ok: true, patch: { time_ms: ms, timer_running: false, timer_started_at: null, status: 'done' } }
+  }
+
+  const value = Number(raw)
+  if (!Number.isFinite(value) || value < 0) return { ok: false, message: 'Score must be a positive number.' }
+  if (mode === 'measure_max') return { ok: true, patch: { measure_value: value, status: 'done' } }
+  return { ok: true, patch: { counter: Math.floor(value), status: 'done' } }
+}
+
+function parseTimeInput(input: string): number | null {
+  const parts = input.split(':').map(part => part.trim())
+  if (parts.some(part => part === '')) return null
+  let seconds = 0
+  if (parts.length === 1) {
+    seconds = Number(parts[0])
+  } else {
+    for (let i = 0; i < parts.length; i += 1) {
+      const value = Number(parts[i])
+      if (!Number.isFinite(value) || value < 0) return null
+      seconds = seconds * 60 + value
+    }
+  }
+  if (!Number.isFinite(seconds) || seconds < 0) return null
+  return Math.round(seconds * 1000)
+}
+
+function clearPatchForMode(mode: RiseScoringMode): Partial<RiseEntry> {
+  const updated_at = new Date().toISOString()
+  if (mode === 'measure_max') return { measure_value: null, status: 'pending', updated_at }
+  if (mode === 'time_fastest' || mode === 'time_longest') {
+    return { time_ms: null, timer_running: false, timer_started_at: null, status: 'pending', updated_at }
+  }
+  return { counter: 0, status: 'pending', updated_at }
+}
+
+async function refetchEntry(
+  supabase: SupabaseClient,
+  entryId: string,
+  setEntries: (updater: (prev: RiseEntry[]) => RiseEntry[]) => void
+) {
+  const { data } = await supabase.from('rise_entries').select(ENTRY_SELECT).eq('id', entryId).single()
+  if (data) setEntries(prev => prev.map(e => (e.id === entryId ? (data as RiseEntry) : e)))
+}
+
+// RISE team control
 function TeamControl({
   event, teams, rounds, setRounds, entries, setEntries, busy, setBusy, supabase,
 }: any) {
