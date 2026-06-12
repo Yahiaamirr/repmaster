@@ -15,6 +15,7 @@ const LOGOS: Record<string, { src: string; bg: string; contain?: boolean }> = {
   'turbo-deadhang':                        { src: '/rise/turbo-logo.jpg',   bg: '#000000' },
   'rlntlss-box-jumps':                     { src: '/rise/rlntlss-logo.png', bg: '#000000' },
   'rltnlss-mqayem06':                      { src: '/rise/rlntlss-logo.png', bg: '#000000' },
+  'sassic-pushups-challenge-mqb26s3p':     { src: '/rise/sassic-logo.jpg',  bg: '#ffffff', contain: true },
 }
 
 // Per-event accent, mirroring each board's sponsor theme.
