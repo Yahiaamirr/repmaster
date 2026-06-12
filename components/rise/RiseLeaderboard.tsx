@@ -261,6 +261,19 @@ export function eventShowsWomen(event: Pick<RiseEvent, 'slug' | 'config'>) {
   return event.config.show_women_on_leaderboard ?? defaultShowWomen(event.slug)
 }
 
+// "10 Muscle-ups @10kg · 20 Pull-ups @30kg · 40 Dips @50kg" — null if no buy-in reps.
+function chipperBuyIn(chipper: RiseEvent['config']['chipper']): string | null {
+  if (!chipper) return null
+  const parts = ([
+    ['Muscle-ups', chipper.mu, chipper.mu_kg],
+    ['Pull-ups', chipper.pu, chipper.pu_kg],
+    ['Dips', chipper.dips, chipper.dips_kg],
+  ] as const)
+    .filter(([, n]) => n > 0)
+    .map(([name, n, kg]) => `${n} ${name}${kg ? ` @${kg}kg` : ''}`)
+  return parts.length ? parts.join(' · ') : null
+}
+
 export function Header({ event, roundName, theme }: { event: RiseEvent; roundName: string | null; theme: BoardTheme }) {
   const isRlntlss = event.slug === RLNTLSS_SLUG || event.slug.startsWith('rltnlss')
   const isEvolve = event.slug === EVOLVE_SLUG
@@ -336,6 +349,7 @@ function TeamBoard({
   const roundEntries = entries.filter(e => e.round_id === activeRound?.id)
   const isQual = (activeRound?.name ?? '').toLowerCase().includes('qual')
   const qualifiers = isQual ? 2 : 0
+  const buyIn = !isQual ? chipperBuyIn(event.config.chipper) : null
 
   const rows = teams
     .map(team => {
@@ -350,6 +364,12 @@ function TeamBoard({
 
   return (
     <div className="mt-8 space-y-3">
+      {buyIn && (
+        <p className="text-center text-xs text-zinc-500">
+          <span className="font-bold tracking-widest uppercase text-zinc-400">Buy-in</span>{' '}
+          {buyIn}
+        </p>
+      )}
       {rows.map((row, i) => {
         const advancing = qualifiers > 0 && i < qualifiers && row.counter > 0
         const isLeader = i === 0 && row.counter > 0

@@ -6,7 +6,7 @@
 -- ── The 5 events ──────────────────────────────────────────
 insert into rise_events (name, slug, scoring_mode, is_team, unit, config, display_order) values
   ('RISE Battle Cycles',     'rise-battle-cycles',  'reps',         true,  'reps',
-     '{"qual_duration":180,"final_duration":360,"chipper":{"mu":0,"pu":0,"dips":0}}', 1),
+     '{"qual_duration":180,"final_duration":360,"chipper":{"mu":10,"pu":20,"dips":40,"mu_kg":10,"pu_kg":30,"dips_kg":50}}', 1),
   ('Evolve Deadlift Ladder', 'evolve-deadlift-ladder','reps',       false, 'reps',
      '{"amrap_weight":100,"qualifiers":3,"top_bar":220}', 2),
   ('LFTD Hyrox Challenge',   'lftd-hyrox',          'time_fastest', false, 'sec', '{}', 3),

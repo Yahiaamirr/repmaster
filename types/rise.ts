@@ -9,7 +9,7 @@ export type RiseEntryStatus = 'pending' | 'active' | 'done'
 export interface RiseEventConfig {
   qual_duration?: number
   final_duration?: number
-  chipper?: { mu: number; pu: number; dips: number }
+  chipper?: { mu: number; pu: number; dips: number; mu_kg?: number; pu_kg?: number; dips_kg?: number }
   amrap_weight?: number
   qualifiers?: number
   top_bar?: number

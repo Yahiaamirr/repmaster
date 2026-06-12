@@ -95,7 +95,7 @@ function ChipperView({
   label,
   onStartAmrap,
 }: {
-  chipper: { mu: number; pu: number; dips: number }
+  chipper: { mu: number; pu: number; dips: number; mu_kg?: number; pu_kg?: number; dips_kg?: number }
   label: string
   onStartAmrap: () => void
 }) {
@@ -105,14 +105,21 @@ function ChipperView({
       <p className="text-xs text-zinc-500 mb-6">Complete the buy-in, then start the AMRAP.</p>
 
       <div className="flex-1 flex flex-col justify-center gap-4">
-        {([['Muscle-ups', chipper.mu], ['Pull-ups', chipper.pu], ['Dips', chipper.dips]] as const)
+        {([
+          ['Muscle-ups', chipper.mu, chipper.mu_kg],
+          ['Pull-ups', chipper.pu, chipper.pu_kg],
+          ['Dips', chipper.dips, chipper.dips_kg],
+        ] as const)
           .filter(([, n]) => n > 0)
-          .map(([name, n]) => (
+          .map(([name, n, kg]) => (
             <div
               key={name}
               className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-5"
             >
-              <span className="text-xl font-bold text-white">{name}</span>
+              <div className="min-w-0">
+                <span className="text-xl font-bold text-white block">{name}</span>
+                {kg ? <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">{kg} kg</span> : null}
+              </div>
               <span className="text-4xl font-black text-[var(--brand-text,#2f5fe0)] tabular-nums">{n}</span>
             </div>
           ))}

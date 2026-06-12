@@ -451,12 +451,19 @@ function TeamControl({
     await supabase.from('rise_rounds').update({ status }).eq('id', roundId)
   }
 
-  async function startQual() {
-    if (!qual || busy) return
+  // Qualification runs in two waves, split evenly by team order (wave 1 = first half).
+  const orderedTeams = [...(teams as RiseTeam[])].sort((a, b) => a.display_order - b.display_order)
+  const mid = Math.ceil(orderedTeams.length / 2)
+  const waveTeams: RiseTeam[][] = [orderedTeams.slice(0, mid), orderedTeams.slice(mid)]
+  const qualTeamIds = new Set(allEntries.filter(e => e.round_id === qual?.id).map(e => e.team_id))
+  const waveStarted = (wave: RiseTeam[]) => wave.length > 0 && wave.every(t => qualTeamIds.has(t.id))
+
+  async function startWave(wave: RiseTeam[]) {
+    if (!qual || busy || wave.length === 0) return
     setBusy(true)
-    // Create a team entry for each team if missing
+    // Put this wave's teams on the board (skip any that already have a qual entry).
     const existing = new Set(allEntries.filter(e => e.round_id === qual.id).map(e => e.team_id))
-    const inserts = (teams as RiseTeam[])
+    const inserts = wave
       .filter(t => !existing.has(t.id))
       .map(t => ({ event_id: ev.id, round_id: qual.id, team_id: t.id, counter: 0, status: 'active' }))
     if (inserts.length) await supabase.from('rise_entries').insert(inserts)
@@ -499,31 +506,68 @@ function TeamControl({
 
   return (
     <>
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Round Flow</h2>
-        <div className="flex flex-wrap gap-3 items-center">
-          <button onClick={startQual} disabled={busy} className="flex items-center gap-2 px-4 py-2.5 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white rounded-lg font-semibold text-sm transition-colors">
-            <Play size={16} /> Start Qualification (3:00)
-          </button>
-          <span className="text-zinc-600">→</span>
-          <div className="flex items-center gap-2">
-            {(['mu', 'pu', 'dips'] as const).map(k => (
-              <label key={k} className="flex items-center gap-1 text-xs text-zinc-400">
-                {k.toUpperCase()}
-                <input
-                  type="number"
-                  value={(chip as any)[k]}
-                  onChange={e => setChip({ ...chip, [k]: Number(e.target.value) })}
-                  className="w-14 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-white outline-none focus:border-[#2f5fe0]"
-                />
-              </label>
-            ))}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-5">
+        {/* Qualification — two waves */}
+        <div>
+          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-1">Qualification — 3:00 AMRAP</h2>
+          <p className="text-xs text-zinc-500 mb-3">Two waves, split by team order. Start a wave to put its teams on the board.</p>
+          <div className="flex flex-wrap gap-3 items-center">
+            {waveTeams.map((wave, wi) => {
+              const started = waveStarted(wave)
+              return (
+                <button
+                  key={wi}
+                  onClick={() => startWave(wave)}
+                  disabled={busy || started || wave.length === 0}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50 ${started ? 'bg-zinc-800 text-zinc-400' : 'bg-[#2f5fe0] hover:bg-[#2348b8] text-white'}`}
+                >
+                  <Play size={16} /> {started ? `Wave ${wi + 1} started` : `Start Wave ${wi + 1}`}
+                  <span className="text-[11px] font-normal opacity-80">{wave.length} {wave.length === 1 ? 'team' : 'teams'}</span>
+                </button>
+              )
+            })}
           </div>
-          <button onClick={advanceToFinal} disabled={busy} className="flex items-center gap-2 px-4 py-2.5 bg-zinc-100 hover:bg-white disabled:opacity-50 text-zinc-950 rounded-lg font-semibold text-sm transition-colors">
-            <Flag size={16} /> Advance Top 2 → Final (6:00)
-          </button>
         </div>
-        {activeRound && <p className="text-xs text-zinc-500 mt-3">Active round: <span className="text-[#2f5fe0] font-semibold">{activeRound.name}</span></p>}
+
+        {/* Final — buy-in + advance */}
+        <div className="border-t border-zinc-800 pt-4">
+          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-1">Final — buy-in + 6:00 AMRAP</h2>
+          <p className="text-xs text-zinc-500 mb-3">Set the buy-in (reps × load), then advance the top 2 teams.</p>
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="flex flex-wrap gap-3">
+              {([['mu', 'Muscle-ups'], ['pu', 'Pull-ups'], ['dips', 'Dips']] as const).map(([k, name]) => (
+                <div key={k} className="flex flex-col gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-zinc-500">{name}</span>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      min={0}
+                      title="reps"
+                      value={(chip as any)[k] ?? 0}
+                      onChange={e => setChip({ ...chip, [k]: Number(e.target.value) })}
+                      className="w-14 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-white text-right tabular-nums outline-none focus:border-[#2f5fe0]"
+                    />
+                    <span className="text-zinc-600 text-xs">×</span>
+                    <input
+                      type="number"
+                      min={0}
+                      title="load (kg)"
+                      value={(chip as any)[`${k}_kg`] ?? 0}
+                      onChange={e => setChip({ ...chip, [`${k}_kg`]: Number(e.target.value) })}
+                      className="w-14 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-white text-right tabular-nums outline-none focus:border-[#2f5fe0]"
+                    />
+                    <span className="text-zinc-600 text-xs">kg</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={advanceToFinal} disabled={busy} className="flex items-center gap-2 px-4 py-2.5 bg-zinc-100 hover:bg-white disabled:opacity-50 text-zinc-950 rounded-lg font-semibold text-sm transition-colors">
+              <Flag size={16} /> Advance Top 2 → Final
+            </button>
+          </div>
+        </div>
+
+        {activeRound && <p className="text-xs text-zinc-500">Active round: <span className="text-[#2f5fe0] font-semibold">{activeRound.name}</span></p>}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
