@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Trash2, Pencil, Check, X, Users } from 'lucide-react'
+import { Plus, Trash2, Pencil, Check, X, Users, Shuffle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { RiseCompetitor, RiseTeam } from '@/types/rise'
 
@@ -84,6 +84,87 @@ export function RiseTeams({
     await supabase.from('rise_competitors').update({ team_id: teamId }).eq('id', competitorId)
   }
 
+  // A team's gender is the majority of its current members (empty = undetermined).
+  function teamGender(teamId: string): 'M' | 'F' | null {
+    const members = competitors.filter(c => c.team_id === teamId)
+    if (members.length === 0) return null
+    const m = members.filter(c => c.gender === 'M').length
+    return m >= members.length - m ? 'M' : 'F'
+  }
+
+  // Randomly distribute unassigned athletes into teams, keeping each team
+  // single-gender: existing team genders are respected, empty teams are split
+  // between men/women by need, then each gender is spread evenly (smallest team
+  // first) across its teams.
+  async function randomAssign() {
+    const pool = competitors.filter(c => !c.team_id)
+    if (pool.length === 0 || teams.length === 0 || busy) return
+    if (!window.confirm(
+      `Randomly assign ${pool.length} unassigned athlete(s) into teams, keeping men and women on separate teams?`
+    )) return
+
+    const shuffle = <T,>(arr: T[]): T[] => {
+      const a = [...arr]
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[a[i], a[j]] = [a[j], a[i]]
+      }
+      return a
+    }
+
+    const uM = shuffle(pool.filter(c => c.gender === 'M'))
+    const uF = shuffle(pool.filter(c => c.gender === 'F'))
+
+    const gender: Record<string, 'M' | 'F' | null> = {}
+    const count: Record<string, number> = {}
+    for (const t of teams) {
+      gender[t.id] = teamGender(t.id)
+      count[t.id] = competitors.filter(c => c.team_id === t.id).length
+    }
+
+    // Allocate empty teams to the gender whose teams are currently most crowded.
+    let athM = competitors.filter(c => c.team_id && c.gender === 'M').length + uM.length
+    let athF = competitors.filter(c => c.team_id && c.gender === 'F').length + uF.length
+    let teamsM = teams.filter(t => gender[t.id] === 'M').length
+    let teamsF = teams.filter(t => gender[t.id] === 'F').length
+    for (const t of teams.filter(t => gender[t.id] === null)) {
+      const rM = athM > 0 ? (teamsM === 0 ? Infinity : athM / teamsM) : -1
+      const rF = athF > 0 ? (teamsF === 0 ? Infinity : athF / teamsF) : -1
+      if (rM < 0 && rF < 0) break
+      if (rM >= rF) { gender[t.id] = 'M'; teamsM++ } else { gender[t.id] = 'F'; teamsF++ }
+    }
+
+    // Spread each gender's athletes into its teams, smallest team first.
+    const assignment: Record<string, string> = {}
+    const place = (list: RiseCompetitor[], g: 'M' | 'F') => {
+      const ids = teams.filter(t => gender[t.id] === g).map(t => t.id)
+      if (ids.length === 0) return list.length // leftovers
+      for (const c of list) {
+        const best = ids.reduce((a, b) => (count[b] < count[a] ? b : a), ids[0])
+        assignment[c.id] = best
+        count[best]++
+      }
+      return 0
+    }
+    const leftover = place(uM, 'M') + place(uF, 'F')
+
+    setBusy(true)
+    setCompetitors(prev => prev.map(c => (assignment[c.id] ? { ...c, team_id: assignment[c.id] } : c)))
+    const byTeam = new Map<string, string[]>()
+    for (const [cid, tid] of Object.entries(assignment)) {
+      byTeam.set(tid, [...(byTeam.get(tid) ?? []), cid])
+    }
+    await Promise.all(
+      [...byTeam.entries()].map(([tid, ids]) =>
+        supabase.from('rise_competitors').update({ team_id: tid }).in('id', ids)
+      )
+    )
+    setBusy(false)
+    if (leftover > 0) {
+      window.alert(`${leftover} athlete(s) couldn’t be placed — add more teams for that gender and run it again.`)
+    }
+  }
+
   const unassigned = competitors.filter(c => !c.team_id).length
 
   return (
@@ -94,6 +175,17 @@ export function RiseTeams({
       <p className="text-xs text-zinc-500 mb-4">
         Create teams and assign athletes. {unassigned > 0 && <span className="text-zinc-400">{unassigned} unassigned.</span>}
       </p>
+
+      {unassigned > 0 && teams.length > 0 && (
+        <button
+          onClick={randomAssign}
+          disabled={busy}
+          className="flex items-center gap-1.5 mb-4 px-3 py-2 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
+          title="Randomly distribute unassigned athletes into teams, keeping men and women on separate teams"
+        >
+          <Shuffle size={15} /> Randomly assign {unassigned} unassigned
+        </button>
+      )}
 
       {/* Teams + add */}
       <div className="flex flex-wrap items-center gap-2 mb-5">

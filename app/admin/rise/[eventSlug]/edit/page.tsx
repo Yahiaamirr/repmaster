@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Trash2, ChevronLeft, AlertTriangle } from 'lucide-react'
+import { Plus, Trash2, ChevronLeft, AlertTriangle, Trophy, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import type { RiseEvent, RiseRound, RiseScoringMode } from '@/types/rise'
 
@@ -148,6 +148,18 @@ export default function EditRiseEventPage() {
         <h1 className="text-2xl font-bold">Edit Event</h1>
         <p className="text-zinc-400 text-sm mt-0.5">Rename or change this event&apos;s settings. The shareable link stays the same.</p>
       </div>
+
+      <Link
+        href={`/admin/rise/${eventSlug}/leaderboard`}
+        className="flex items-center gap-3 mb-8 bg-zinc-900 border border-zinc-800 hover:border-[#2f5fe0]/50 rounded-xl px-5 py-4 transition-colors group"
+      >
+        <Trophy size={18} className="text-[#4d7bff]" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white">Manual Leaderboard</p>
+          <p className="text-xs text-zinc-500">Hand-set the standings and publish them over the live board.</p>
+        </div>
+        <ChevronRight size={18} className="text-zinc-600 group-hover:text-white transition-colors" />
+      </Link>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <Section title="Event Details">

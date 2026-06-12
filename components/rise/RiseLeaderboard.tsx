@@ -11,7 +11,7 @@ import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, Turbo
 // Default is the RISE navy/blue look. The Evolve event uses a monochrome
 // black-and-white theme drawn from theevolveway.com (premium, high-contrast,
 // bold uppercase) to match its sponsor branding.
-type BoardTheme = {
+export type BoardTheme = {
   pageBg: string
   pageText: string
   headerBorder: string
@@ -157,6 +157,15 @@ const lftdTheme: BoardTheme = {
   value: 'text-[#0f2e64]',
 }
 
+// Per-event board theme — shared with the manual board so both look identical.
+export function boardTheme(slug: string): BoardTheme {
+  return slug === EVOLVE_SLUG ? evolveTheme
+    : slug === TURBO_SLUG ? turboTheme
+    : slug === LFTD_SLUG ? lftdTheme
+    : slug === RLNTLSS_SLUG ? rlntlssTheme
+    : riseTheme
+}
+
 export function RiseLeaderboard({
   event,
   teams,
@@ -193,12 +202,7 @@ export function RiseLeaderboard({
     roundList[0] ??
     null
 
-  const theme =
-    event.slug === EVOLVE_SLUG ? evolveTheme
-    : event.slug === TURBO_SLUG ? turboTheme
-    : event.slug === LFTD_SLUG ? lftdTheme
-    : event.slug === RLNTLSS_SLUG ? rlntlssTheme
-    : riseTheme
+  const theme = boardTheme(event.slug)
 
   return (
     <div className={`min-h-[100dvh] ${theme.pageBg} ${theme.pageText}`}>
@@ -214,7 +218,7 @@ export function RiseLeaderboard({
   )
 }
 
-function Header({ event, roundName, theme }: { event: RiseEvent; roundName: string | null; theme: BoardTheme }) {
+export function Header({ event, roundName, theme }: { event: RiseEvent; roundName: string | null; theme: BoardTheme }) {
   const isRlntlss = event.slug === RLNTLSS_SLUG
   const isEvolve = event.slug === EVOLVE_SLUG
   const isTurbo = event.slug === TURBO_SLUG

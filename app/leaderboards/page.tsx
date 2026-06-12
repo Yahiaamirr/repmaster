@@ -1,17 +1,20 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ChevronRight, Users, User, Timer, Dumbbell, ArrowUp, Trophy } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import Image from 'next/image'
 import type { RiseEvent, RiseScoringMode } from '@/types/rise'
 import { RiseWordmark } from '@/components/rise/RiseBrand'
 
 export const dynamic = 'force-dynamic'
 
-const ICONS: Record<string, React.ReactNode> = {
-  'rise-battle-cycles': <Users size={20} />,
-  'evolve-deadlift-ladder': <Dumbbell size={20} />,
-  'lftd-hyrox': <Timer size={20} />,
-  'turbo-deadhang': <User size={20} />,
-  'rlntlss-box-jumps': <ArrowUp size={20} />,
+const LOGOS: Record<string, { src: string; bg: string; contain?: boolean }> = {
+  'rise-battle-cycles':                    { src: '/rise/rise-logo.png',    bg: '#000000' },
+  'rise-ring-pushups-challenge-mqb12k1g':  { src: '/rise/rise-logo.png',    bg: '#000000' },
+  'evolve-deadlift-ladder':                { src: '/rise/evolve-logo.webp', bg: '#ffffff', contain: true },
+  'lftd-hyrox':                            { src: '/rise/lftd-logo.jpg',    bg: '#d4e84a' },
+  'turbo-deadhang':                        { src: '/rise/turbo-logo.jpg',   bg: '#000000' },
+  'rlntlss-box-jumps':                     { src: '/rise/rlntlss-logo.png', bg: '#000000' },
+  'rltnlss-mqayem06':                      { src: '/rise/rlntlss-logo.png', bg: '#000000' },
 }
 
 // Per-event accent, mirroring each board's sponsor theme.
@@ -56,10 +59,18 @@ export default async function LeaderboardsPage() {
               className="group relative flex items-center gap-4 rounded-2xl border border-[#1a2547] bg-[#0b1226] px-5 py-5 transition-colors hover:border-[var(--accent)]/60 hover:bg-[#101a3a]"
             >
               <span
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                style={{ background: `color-mix(in srgb, ${accent} 15%, transparent)`, color: accent }}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl overflow-hidden"
+                style={{ background: LOGOS[ev.slug]?.bg ?? `color-mix(in srgb, ${accent} 15%, transparent)` }}
               >
-                {ICONS[ev.slug] ?? <Trophy size={20} />}
+                {LOGOS[ev.slug] ? (
+                  <Image
+                    src={LOGOS[ev.slug].src}
+                    alt={ev.name}
+                    width={44}
+                    height={44}
+                    className={`w-full h-full ${LOGOS[ev.slug].contain ? 'object-contain p-1' : 'object-cover'}`}
+                  />
+                ) : null}
               </span>
               <div className="flex-1 min-w-0">
                 <p className="font-black text-lg truncate">{ev.name}</p>
