@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { boardTheme, Header, WomenVisibilityToggle, useWomenVisibility, type BoardTheme } from './RiseLeaderboard'
+import { boardTheme, eventShowsWomen, Header, type BoardTheme } from './RiseLeaderboard'
 import { isTeamScored } from '@/types/rise'
 import type { RiseEvent, RiseManualResult, RiseGender } from '@/types/rise'
 
@@ -16,10 +16,11 @@ export function RiseManualBoard({
   initialManual: RiseManualResult[]
 }) {
   const supabase = createClient()
+  const [eventState, setEventState] = useState(event)
   const [manual, setManual] = useState(initialManual)
-  const theme = boardTheme(event.slug)
-  const teamMode = isTeamScored(event)
-  const [showWomen, setShowWomen] = useWomenVisibility(event.slug)
+  const theme = boardTheme(eventState.slug)
+  const teamMode = isTeamScored(eventState)
+  const showWomen = eventShowsWomen(eventState)
 
   // Live-refresh as the admin edits/republishes the manual standings.
   useEffect(() => {
@@ -28,6 +29,9 @@ export function RiseManualBoard({
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rise_manual_results', filter: `event_id=eq.${event.id}` }, async () => {
         const { data } = await supabase.from('rise_manual_results').select(MANUAL_SELECT).eq('event_id', event.id)
         if (data) setManual(data as RiseManualResult[])
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rise_events', filter: `id=eq.${event.id}` }, payload => {
+        if (payload.new?.id) setEventState(payload.new as RiseEvent)
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
@@ -39,18 +43,15 @@ export function RiseManualBoard({
 
   return (
     <div className={`min-h-[100dvh] ${theme.pageBg} ${theme.pageText}`}>
-      <Header event={event} roundName={teamMode ? 'Final Standings' : null} theme={theme} />
+      <Header event={eventState} roundName={teamMode ? 'Final Standings' : null} theme={theme} />
       <div className="px-4 pb-16 max-w-6xl mx-auto">
         {teamMode ? (
           <Column title={null} rows={rows} theme={theme} />
         ) : (
-          <>
-            <WomenVisibilityToggle showWomen={showWomen} setShowWomen={setShowWomen} theme={theme} />
-            <div className={`mt-8 grid grid-cols-1 ${showWomen ? 'lg:grid-cols-2' : 'max-w-3xl mx-auto'} gap-6`}>
-              <Column title="Men" rows={rows.filter(r => (r.competitor?.gender ?? 'M') === 'M')} theme={theme} />
-              {showWomen && <Column title="Women" rows={rows.filter(r => (r.competitor?.gender ?? 'M') === 'F')} theme={theme} />}
-            </div>
-          </>
+          <div className={`mt-8 grid grid-cols-1 ${showWomen ? 'lg:grid-cols-2' : 'max-w-3xl mx-auto'} gap-6`}>
+            <Column title="Men" rows={rows.filter(r => (r.competitor?.gender ?? 'M') === 'M')} theme={theme} />
+            {showWomen && <Column title="Women" rows={rows.filter(r => (r.competitor?.gender ?? 'M') === 'F')} theme={theme} />}
+          </div>
         )}
       </div>
     </div>

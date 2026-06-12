@@ -18,6 +18,7 @@ export interface RiseEventConfig {
   time_cap_sec?: number
   wave_size?: number
   auto_dnf?: boolean // auto-DNF a team that passes the cap (default on)
+  show_women_on_leaderboard?: boolean
   [key: string]: unknown
 }
 
