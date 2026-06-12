@@ -193,7 +193,7 @@ export function boardTheme(slug: string): BoardTheme {
 }
 
 export function RiseLeaderboard({
-  event,
+  event: initialEvent,
   teams,
   rounds,
   initialEntries,
@@ -220,7 +220,8 @@ export function RiseLeaderboard({
         if (data) setRoundList(data as RiseRound[])
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rise_events', filter: `id=eq.${event.id}` }, payload => {
-        if (payload.new?.id) setEvent(payload.new as RiseEvent)
+        const next = payload.new as RiseEvent | null
+        if (next?.id) setEvent(next)
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }

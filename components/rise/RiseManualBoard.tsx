@@ -31,7 +31,8 @@ export function RiseManualBoard({
         if (data) setManual(data as RiseManualResult[])
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rise_events', filter: `id=eq.${event.id}` }, payload => {
-        if (payload.new?.id) setEventState(payload.new as RiseEvent)
+        const next = payload.new as RiseEvent | null
+        if (next?.id) setEventState(next)
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }

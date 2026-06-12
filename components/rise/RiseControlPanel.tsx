@@ -67,6 +67,9 @@ export function RiseControlPanel({
   return (
     <div className="space-y-6">
       <StatusBar event={event} onSet={setStatus} onReset={resetEvent} busy={busy} />
+      {!event.is_team && !event.config.team_timed && (
+        <WomenColumnPanel event={event} setEvent={setEvent} supabase={supabase} />
+      )}
       <AttendancePanel
         supabase={supabase}
         eventId={event.id}
@@ -150,6 +153,53 @@ function StatusBar({ event, onSet, onReset, busy }: { event: RiseEvent; onSet: (
           Reset
         </button>
       </div>
+    </div>
+  )
+}
+
+// ── Leaderboard display: women's column toggle ──────────────
+function WomenColumnPanel({
+  event, setEvent, supabase,
+}: {
+  event: RiseEvent
+  setEvent: (updater: (prev: RiseEvent) => RiseEvent) => void
+  supabase: SupabaseClient
+}) {
+  const [saving, setSaving] = useState(false)
+  const showWomen = eventShowsWomen(event)
+
+  async function toggle() {
+    if (saving) return
+    const next = !showWomen
+    setSaving(true)
+    setEvent(prev => ({ ...prev, config: { ...prev.config, show_women_on_leaderboard: next } }))
+    const { error } = await supabase
+      .from('rise_events')
+      .update({ config: { ...event.config, show_women_on_leaderboard: next } })
+      .eq('id', event.id)
+    if (error) setEvent(prev => ({ ...prev, config: { ...prev.config, show_women_on_leaderboard: showWomen } }))
+    setSaving(false)
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+      <div className="flex items-center gap-2">
+        <Venus size={16} className="text-pink-400" />
+        <div>
+          <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Women&apos;s column</h2>
+          <p className="text-xs text-zinc-500">Show a separate women&apos;s leaderboard for this event.</p>
+        </div>
+      </div>
+      <button
+        onClick={toggle}
+        disabled={saving}
+        role="switch"
+        aria-checked={showWomen}
+        aria-label="Show women's column on the leaderboard"
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${showWomen ? 'bg-[#2f5fe0]' : 'bg-zinc-700'}`}
+      >
+        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showWomen ? 'translate-x-6' : 'translate-x-1'}`} />
+      </button>
     </div>
   )
 }
