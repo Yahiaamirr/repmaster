@@ -46,8 +46,8 @@ export function LftdMark({ className = 'h-12 w-auto' }: { className?: string }) 
 export const LFTD_SLUG = 'lftd-hyrox'
 
 // SASSIC sponsor mark (black on white — inverted to white on black for dark surfaces).
-export function SassicMark({ className = 'h-10 w-auto' }: { className?: string }) {
-  return <img src="/rise/sassic-logo.jpg" alt="SASSIC" className={`${className} invert rounded-sm`} draggable={false} />
+export function SassicMark({ className = 'h-10 w-auto', invert = false }: { className?: string; invert?: boolean }) {
+  return <img src="/rise/sassic-logo.jpg" alt="SASSIC" className={`${className} rounded-sm${invert ? ' invert' : ''}`} draggable={false} />
 }
 
 // Slug prefix for SASSIC-branded events (suffix is dynamic).

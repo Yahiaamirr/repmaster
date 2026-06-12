@@ -157,12 +157,38 @@ const lftdTheme: BoardTheme = {
   value: 'text-[#0f2e64]',
 }
 
+// SASSIC — warm off-white ground, pure black ink. Minimalist athletic-fashion.
+const sassicTheme: BoardTheme = {
+  pageBg: 'bg-[#f5f3ef]',
+  pageText: 'text-[#0a0a0a]',
+  headerBorder: 'border-[#d8d4cc]',
+  headerGlow: 'bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.04),transparent_60%)]',
+  liveText: 'text-[#0a0a0a]',
+  liveDot: 'bg-[#0a0a0a]',
+  roundName: 'text-[#777]',
+  leaderRow: 'bg-white border-black/30',
+  advancingRow: 'bg-white/70 border-black/15',
+  baseRow: 'bg-white/40 border-[#d8d4cc]',
+  rankLeader: 'text-[#0a0a0a]',
+  rankBase: 'text-[#aaa]',
+  qualifying: 'text-[#0a0a0a]',
+  counterLeader: 'text-[#0a0a0a]',
+  counterBase: 'text-[#0a0a0a]',
+  genderContainer: 'bg-white/50 border-[#d8d4cc]',
+  genderBar: 'bg-[#0a0a0a]',
+  genderBarText: 'text-white',
+  rowDivider: 'border-[#e8e5e0]',
+  timerHighlight: 'bg-black/5',
+  value: 'text-[#0a0a0a]',
+}
+
 // Per-event board theme — shared with the manual board so both look identical.
 export function boardTheme(slug: string): BoardTheme {
   return slug === EVOLVE_SLUG ? evolveTheme
     : slug === TURBO_SLUG ? turboTheme
     : slug === LFTD_SLUG ? lftdTheme
     : slug === RLNTLSS_SLUG ? rlntlssTheme
+    : slug.startsWith(SASSIC_SLUG_PREFIX) ? sassicTheme
     : riseTheme
 }
 
