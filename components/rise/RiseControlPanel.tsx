@@ -68,6 +68,7 @@ export function RiseControlPanel({
       <StatusBar event={event} onSet={setStatus} onReset={resetEvent} busy={busy} />
       <AttendancePanel
         supabase={supabase}
+        eventId={event.id}
         teams={teams}
         isTeam={event.is_team}
         initialCompetitors={competitors}
@@ -263,9 +264,10 @@ function TeamControl({
 
 // ── Attendance / check-in ───────────────────────────────────
 function AttendancePanel({
-  supabase, teams, isTeam, initialCompetitors,
+  supabase, eventId, teams, isTeam, initialCompetitors,
 }: {
   supabase: SupabaseClient
+  eventId: string
   teams: RiseTeam[]
   isTeam: boolean
   initialCompetitors: RiseCompetitor[]
@@ -273,6 +275,19 @@ function AttendancePanel({
   const [comps, setComps] = useState<RiseCompetitor[]>(initialCompetitors)
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(false)
+
+  // Reflect check-ins from other devices and auto-attendance (recorded scores) live.
+  useEffect(() => {
+    const channel = supabase
+      .channel(`rise-attendance-${eventId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rise_competitors', filter: `event_id=eq.${eventId}` }, payload => {
+        const row = payload.new as RiseCompetitor
+        if (!row?.id) return
+        setComps(prev => prev.map(c => (c.id === row.id ? { ...c, checked_in: row.checked_in, checked_in_at: row.checked_in_at, team_id: row.team_id } : c)))
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [supabase, eventId])
 
   const present = comps.filter(c => c.checked_in).length
 
