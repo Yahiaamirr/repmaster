@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { Radio, ExternalLink, ChevronLeft, QrCode } from 'lucide-react'
+import { Radio, ExternalLink, ChevronLeft, QrCode, Pencil } from 'lucide-react'
 import { RiseTokenManager } from '@/components/rise/RiseTokenManager'
 import { RiseRoster } from '@/components/rise/RiseRoster'
 import { RiseRegisterQR } from '@/components/rise/RiseRegisterQR'
@@ -84,6 +84,9 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
             </div>
           </div>
           <div className="flex gap-2">
+            <Link href={`/admin/rise/${ev.slug}/edit`} className="flex items-center gap-1.5 text-sm px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors">
+              <Pencil size={15} /> Edit
+            </Link>
             <Link href={`/admin/rise/${ev.slug}/control`} className="flex items-center gap-1.5 text-sm px-4 py-2 bg-[var(--brand,#2f5fe0)] hover:bg-[var(--brand-press,#2348b8)] text-[var(--brand-contrast,#fff)] rounded-lg font-semibold transition-colors">
               <Radio size={15} /> Control
             </Link>
