@@ -44,6 +44,8 @@ export interface RiseCompetitor {
   gender: RiseGender
   display_order: number
   meta: Record<string, unknown>
+  checked_in?: boolean
+  checked_in_at?: string | null
 }
 
 export interface RiseRound {
@@ -83,6 +85,24 @@ export interface RiseJudgeToken {
   label: string | null
   scope: { team_id?: string; competitor_id?: string; round_id?: string }
   created_at: string
+  judge_name?: string | null
+  last_seen_at?: string | null
+}
+
+// A judge ↔ athlete/team pairing recorded when a judge scores.
+export interface RiseJudgeLog {
+  id: string
+  token_id: string
+  event_id: string
+  competitor_id: string | null
+  team_id: string | null
+  judge_name: string | null
+  score_count: number
+  first_at: string
+  last_at: string
+  // joined
+  competitor?: { name: string; gender: RiseGender } | null
+  team?: { name: string } | null
 }
 
 // ── Helpers shared across leaderboard + control ──────────────

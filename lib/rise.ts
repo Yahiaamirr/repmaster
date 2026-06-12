@@ -26,6 +26,12 @@ export async function setMeasure(supabase: SupabaseClient, entryId: string, valu
     .eq('id', entryId)
 }
 
+// Record (fire-and-forget) that this judge token is judging an entry's athlete/team.
+// Called when a judge starts scoring an athlete — upserts one row per pairing.
+export async function logJudge(supabase: SupabaseClient, token: string, entryId: string) {
+  return supabase.rpc('rise_log_judge', { p_token: token, p_entry_id: entryId })
+}
+
 export async function setPhase(supabase: SupabaseClient, entryId: string, phase: string) {
   return supabase
     .from('rise_entries')

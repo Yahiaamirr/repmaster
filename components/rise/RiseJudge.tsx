@@ -61,6 +61,13 @@ export function RiseJudge({
     if (saved) setName(saved)
   }, [nameKey])
 
+  // Persist the judge's name to the token so admins can see who's scoring.
+  // Runs for both a freshly entered name and one restored from localStorage.
+  useEffect(() => {
+    if (!name) return
+    supabase.rpc('rise_register_judge', { p_token: token, p_name: name })
+  }, [name, token])
+
   // Establish the device-lock presence channel once we have a name.
   useEffect(() => {
     if (!name) return
@@ -209,7 +216,7 @@ export function RiseJudge({
 
   // ── This device holds the lock → render the judge UI ──
   if (mode === 'scoped') {
-    return <RiseJudgeClient event={event} label={name} scope={scope} initialEntries={initialEntries} />
+    return <RiseJudgeClient event={event} token={token} label={name} scope={scope} initialEntries={initialEntries} />
   }
-  return <RiseJudgeRoster event={event} label={name} competitors={competitors} initialEntries={initialEntries} />
+  return <RiseJudgeRoster event={event} token={token} label={name} competitors={competitors} initialEntries={initialEntries} />
 }
