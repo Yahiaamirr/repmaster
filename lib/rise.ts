@@ -19,6 +19,16 @@ export async function timerStop(supabase: SupabaseClient, entryId: string) {
   return supabase.rpc('rise_timer_stop', { p_entry_id: entryId })
 }
 
+// Resume a stopped timer without losing elapsed time: back-date timer_started_at
+// by the already-recorded ms so the clock continues from where it was stopped.
+export async function timerResume(supabase: SupabaseClient, entryId: string, priorMs: number) {
+  const startedAt = new Date(Date.now() - Math.max(0, priorMs)).toISOString()
+  return supabase
+    .from('rise_entries')
+    .update({ timer_running: true, timer_started_at: startedAt, time_ms: null, status: 'active', updated_at: new Date().toISOString() })
+    .eq('id', entryId)
+}
+
 export async function setMeasure(supabase: SupabaseClient, entryId: string, value: number) {
   return supabase
     .from('rise_entries')

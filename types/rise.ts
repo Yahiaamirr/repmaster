@@ -13,6 +13,10 @@ export interface RiseEventConfig {
   amrap_weight?: number
   qualifiers?: number
   top_bar?: number
+  // Team-timed (wave) mode — e.g. Hyrox: one timer per team, waves of N, time cap.
+  team_timed?: boolean
+  time_cap_sec?: number
+  wave_size?: number
   [key: string]: unknown
 }
 
@@ -52,6 +56,23 @@ export interface RiseTeam {
   name: string
   display_order: number
 }
+
+// True when an event is ranked by team rather than by individual athlete:
+// the fixed-team events (is_team) or an individual event flagged team-timed (Hyrox).
+export function isTeamScored(event: { is_team: boolean; config?: RiseEventConfig }): boolean {
+  return event.is_team || !!event.config?.team_timed
+}
+
+// A team's gender = the majority of its members (teams are single-gender in practice).
+export function teamGenderOf(competitors: { team_id: string | null; gender: RiseGender }[], teamId: string): RiseGender | null {
+  const members = competitors.filter(c => c.team_id === teamId)
+  if (members.length === 0) return null
+  const m = members.filter(c => c.gender === 'M').length
+  return m >= members.length - m ? 'M' : 'F'
+}
+
+export const RISE_TIME_CAP_DEFAULT = 900 // 15:00
+export const RISE_WAVE_SIZE_DEFAULT = 2
 
 export interface RiseCompetitor {
   id: string

@@ -6,6 +6,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT, adjustCounter } from '@/lib/rise'
 import { rankEntries, entryValue } from '@/types/rise'
+import { RiseWaveControl } from './RiseWaveControl'
 import type {
   RiseCompetitor, RiseEntry, RiseEvent, RiseRound, RiseStatus, RiseTeam,
 } from '@/types/rise'
@@ -77,6 +78,17 @@ export function RiseControlPanel({
           teams={teams}
           rounds={rounds}
           setRounds={setRounds}
+          entries={entries}
+          setEntries={setEntries}
+          busy={busy}
+          setBusy={setBusy}
+          supabase={supabase}
+        />
+      ) : event.config.team_timed ? (
+        <RiseWaveControl
+          event={event}
+          teams={teams}
+          competitors={competitors}
           entries={entries}
           setEntries={setEntries}
           busy={busy}

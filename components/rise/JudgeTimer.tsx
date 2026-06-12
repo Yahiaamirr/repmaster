@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Play, Square, RotateCcw } from 'lucide-react'
+import { Play, Square, RotateCcw, FastForward } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { timerStart, timerStop } from '@/lib/rise'
+import { timerStart, timerStop, timerResume } from '@/lib/rise'
 import { formatMs } from '@/types/rise'
 import type { RiseEntry, RiseEvent } from '@/types/rise'
 import { JudgeHeader } from './JudgeHeader'
@@ -61,6 +61,16 @@ export function JudgeTimer({
     setBusy(false)
   }
 
+  // Continue a stopped timer from where it left off (e.g. after an accidental stop).
+  async function resume() {
+    if (busy) return
+    setBusy(true)
+    const priorMs = entry.time_ms ?? displayMs
+    onLocalChange({ timer_running: true, timer_started_at: new Date(Date.now() - priorMs).toISOString(), time_ms: null, status: 'active' })
+    await timerResume(supabase, entry.id, priorMs)
+    setBusy(false)
+  }
+
   async function reset() {
     if (busy) return
     setBusy(true)
@@ -95,26 +105,43 @@ export function JudgeTimer({
       {/* Controls */}
       <div className="p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {!running ? (
-          <div className="flex flex-col gap-3">
+          finished ? (
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={resume}
+                disabled={busy}
+                className="w-full h-32 flex items-center justify-center gap-4 bg-[var(--brand,#2f5fe0)] active:bg-[var(--brand-press,#2348b8)] disabled:opacity-60 text-[var(--brand-contrast,#fff)] font-black text-3xl rounded-3xl transition-colors"
+              >
+                <FastForward size={38} fill="currentColor" />
+                RESUME
+              </button>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={start}
+                  disabled={busy}
+                  className="h-14 flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 active:bg-zinc-800 text-zinc-300 font-semibold rounded-2xl transition-colors"
+                >
+                  <Play size={16} fill="currentColor" /> Restart from 0
+                </button>
+                <button
+                  onClick={reset}
+                  disabled={busy}
+                  className="h-14 flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 active:bg-zinc-800 text-zinc-400 font-semibold rounded-2xl transition-colors"
+                >
+                  <RotateCcw size={16} /> Clear time
+                </button>
+              </div>
+            </div>
+          ) : (
             <button
               onClick={start}
               disabled={busy}
               className="w-full h-32 flex items-center justify-center gap-4 bg-[var(--brand,#2f5fe0)] active:bg-[var(--brand-press,#2348b8)] disabled:opacity-60 text-[var(--brand-contrast,#fff)] font-black text-3xl rounded-3xl transition-colors"
             >
               <Play size={40} fill="currentColor" />
-              {finished ? 'RESTART' : 'START'}
+              START
             </button>
-            {finished && (
-              <button
-                onClick={reset}
-                disabled={busy}
-                className="w-full h-14 flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 active:bg-zinc-800 text-zinc-400 font-semibold rounded-2xl transition-colors"
-              >
-                <RotateCcw size={18} />
-                Clear time
-              </button>
-            )}
-          </div>
+          )
         ) : (
           <button
             onClick={stop}

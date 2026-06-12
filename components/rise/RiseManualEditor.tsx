@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronUp, ChevronDown, Wand2, Save, RotateCcw, Trophy } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { rankEntries, entryValue } from '@/types/rise'
+import { rankEntries, entryValue, isTeamScored } from '@/types/rise'
 import type { RiseCompetitor, RiseEntry, RiseEvent, RiseManualResult, RiseTeam } from '@/types/rise'
 
 type Row = {
@@ -60,7 +60,7 @@ export function RiseManualEditor({
 }) {
   const supabase = createClient()
   const router = useRouter()
-  const isTeam = event.is_team
+  const isTeam = isTeamScored(event)
   const [rows, setRows] = useState<Row[]>(() => buildRows(competitors, teams, isTeam, initialManual))
   const [published, setPublished] = useState(!!event.manual_leaderboard)
   const [busy, setBusy] = useState(false)
@@ -96,12 +96,16 @@ export function RiseManualEditor({
   // Fill values + order from the current live scoring.
   function prefillFromLive() {
     if (isTeam) {
-      const best = new Map<string, number>()
-      for (const e of initialEntries) {
-        if (e.team_id) best.set(e.team_id, Math.max(best.get(e.team_id) ?? 0, e.counter))
-      }
-      const ordered = [...rows].sort((a, b) => (best.get(b.team_id!) ?? 0) - (best.get(a.team_id!) ?? 0))
-      setRows(ordered.map(r => ({ ...r, value: String(best.get(r.team_id!) ?? 0) })))
+      // Rank team entries by the event's scoring mode (reps, fastest time, etc.).
+      const entryForTeam = (tid: string) => initialEntries.find(e => e.team_id === tid) ?? null
+      const teamEntries = rows.map(r => entryForTeam(r.team_id!)).filter(Boolean) as RiseEntry[]
+      const ranked = rankEntries(teamEntries, event.scoring_mode)
+      const order = new Map(ranked.map((e, i) => [e.team_id, i]))
+      const sorted = [...rows].sort((a, b) => (order.get(a.team_id!) ?? 999) - (order.get(b.team_id!) ?? 999))
+      setRows(sorted.map(r => {
+        const e = entryForTeam(r.team_id!)
+        return { ...r, value: e ? entryValue(e, event.scoring_mode, event.unit) : r.value }
+      }))
       return
     }
     // Individual: rank each gender separately using the event's scoring mode.

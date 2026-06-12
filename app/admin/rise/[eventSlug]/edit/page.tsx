@@ -219,6 +219,41 @@ export default function EditRiseEventPage() {
           </button>
         </Section>
 
+        <Section title="Team Scoring (waves)">
+          <label className="flex items-center gap-2.5 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={Boolean(config.team_timed)}
+              onChange={e => setConfig(c => ({ ...c, team_timed: e.target.checked }))}
+              className="h-4 w-4 accent-[#2f5fe0]"
+            />
+            <span className="text-sm text-white">Team-timed — one timer per team, run in waves, ranked by time (e.g. Hyrox)</span>
+          </label>
+          {Boolean(config.team_timed) && (
+            <div className="grid grid-cols-2 gap-4 pt-1">
+              <Field label="Time cap (minutes)">
+                <input
+                  className="input"
+                  type="number"
+                  min={1}
+                  value={Math.round((Number(config.time_cap_sec ?? 900)) / 60)}
+                  onChange={e => setConfig(c => ({ ...c, time_cap_sec: Math.max(1, Number(e.target.value || 0)) * 60 }))}
+                />
+              </Field>
+              <Field label="Teams per wave">
+                <input
+                  className="input"
+                  type="number"
+                  min={1}
+                  value={Number(config.wave_size ?? 2)}
+                  onChange={e => setConfig(c => ({ ...c, wave_size: Math.max(1, Number(e.target.value || 0)) }))}
+                />
+              </Field>
+            </div>
+          )}
+          <p className="text-xs text-zinc-500">Female teams run first. Group athletes into teams in the Teams panel on the event page.</p>
+        </Section>
+
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">
             {error}

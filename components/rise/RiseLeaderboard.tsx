@@ -236,6 +236,8 @@ export function RiseLeaderboard({
       <div className="px-4 pb-16 max-w-6xl mx-auto">
         {event.is_team ? (
           <TeamBoard event={event} teams={teams} rounds={roundList} activeRound={activeRound} entries={entries} theme={theme} />
+        ) : event.config.team_timed ? (
+          <TeamTimeBoard teams={teams} entries={entries} theme={theme} />
         ) : (
           <SplitBoard event={event} entries={entries} theme={theme} />
         )}
@@ -373,6 +375,44 @@ function TeamBoard({
       {qualifiers > 0 && (
         <p className="text-center text-xs text-zinc-600 pt-2">Top {qualifiers} teams advance to the final</p>
       )}
+    </div>
+  )
+}
+
+// ── Team-time board (e.g. Hyrox): one combined list of teams by finish time ──
+function TeamTimeBoard({ teams, entries, theme }: { teams: RiseTeam[]; entries: RiseEntry[]; theme: BoardTheme }) {
+  const rows = teams.map(team => ({ team, entry: entries.find(e => e.team_id === team.id) ?? null }))
+  const bucket = (r: { entry: RiseEntry | null }) => (r.entry?.time_ms != null ? 0 : r.entry?.timer_running ? 1 : 2)
+  rows.sort((a, b) => {
+    const ba = bucket(a), bb = bucket(b)
+    if (ba !== bb) return ba - bb
+    if (ba === 0) return (a.entry!.time_ms ?? 0) - (b.entry!.time_ms ?? 0)
+    return a.team.display_order - b.team.display_order
+  })
+  const anyResult = rows.some(r => r.entry?.time_ms != null || r.entry?.timer_running)
+  if (!anyResult) return <div className="mt-8"><Empty message="No teams on the clock yet. Standings appear here live." /></div>
+
+  const medals = ['🥇', '🥈', '🥉']
+  return (
+    <div className="mt-8 space-y-3 max-w-3xl mx-auto">
+      {rows.map((r, i) => {
+        const done = r.entry?.time_ms != null
+        const running = !!r.entry?.timer_running
+        const isLeader = i === 0 && done
+        return (
+          <div key={r.team.id} className={`flex items-center gap-4 rounded-2xl border px-5 py-4 ${isLeader ? theme.leaderRow : running ? theme.advancingRow : theme.baseRow} ${running ? theme.timerHighlight : ''}`}>
+            <span className={`text-2xl font-black tabular-nums w-10 text-center ${isLeader ? theme.rankLeader : theme.rankBase}`}>
+              {done ? (medals[i] ?? i + 1) : '—'}
+            </span>
+            <p className="flex-1 min-w-0 text-xl sm:text-2xl font-black truncate">{r.team.name}</p>
+            <span className={`text-3xl sm:text-4xl font-black tabular-nums ${theme.value}`}>
+              {running && r.entry?.timer_started_at
+                ? <LiveTimer startedAt={r.entry.timer_started_at} />
+                : done ? formatMs(r.entry!.time_ms) : <span className="text-zinc-700">—</span>}
+            </span>
+          </div>
+        )
+      })}
     </div>
   )
 }

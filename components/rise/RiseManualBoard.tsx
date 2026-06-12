@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { boardTheme, Header, type BoardTheme } from './RiseLeaderboard'
+import { isTeamScored } from '@/types/rise'
 import type { RiseEvent, RiseManualResult, RiseGender } from '@/types/rise'
 
 const MANUAL_SELECT = '*, competitor:rise_competitors(name, gender), team:rise_teams(name)'
@@ -17,6 +18,7 @@ export function RiseManualBoard({
   const supabase = createClient()
   const [manual, setManual] = useState(initialManual)
   const theme = boardTheme(event.slug)
+  const teamMode = isTeamScored(event)
 
   // Live-refresh as the admin edits/republishes the manual standings.
   useEffect(() => {
@@ -36,9 +38,9 @@ export function RiseManualBoard({
 
   return (
     <div className={`min-h-[100dvh] ${theme.pageBg} ${theme.pageText}`}>
-      <Header event={event} roundName={event.is_team ? 'Final Standings' : null} theme={theme} />
+      <Header event={event} roundName={teamMode ? 'Final Standings' : null} theme={theme} />
       <div className="px-4 pb-16 max-w-6xl mx-auto">
-        {event.is_team ? (
+        {teamMode ? (
           <Column title={null} rows={rows} theme={theme} />
         ) : (
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
