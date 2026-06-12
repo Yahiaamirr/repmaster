@@ -75,6 +75,20 @@ export function RiseTeamManager({
     await supabase.from('rise_competitors').update({ team_id: teamId }).eq('id', competitorId)
   }
 
+  // Create a brand-new athlete directly on a team (quick-add for walk-ins / no-show swaps).
+  async function createMember(teamId: string, name: string, gender: 'M' | 'F') {
+    const trimmed = name.trim()
+    if (!trimmed || busy) return
+    setBusy(true)
+    const { data } = await supabase
+      .from('rise_competitors')
+      .insert({ event_id: eventId, name: trimmed, gender, team_id: teamId })
+      .select('*')
+      .single()
+    if (data) setCompetitors(prev => [...prev, data as RiseCompetitor])
+    setBusy(false)
+  }
+
   async function addTeam(e: React.FormEvent) {
     e.preventDefault()
     const name = newTeam.trim()
@@ -270,6 +284,7 @@ export function RiseTeamManager({
                   setAddSearch={setAddSearch}
                   onAdd={(id) => assign(id, team.id)}
                   onRemove={(id) => assign(id, null)}
+                  onCreate={(name, gender) => createMember(team.id, name, gender)}
                 />
               ))}
               <UnassignedCard unassigned={unassigned} />
@@ -288,7 +303,7 @@ function GenderBadge({ g }: { g: 'M' | 'F' }) {
 function TeamCard({
   team, members, gender, unassigned, allowTeamEdits, busy,
   isEditing, editName, setEditName, onStartRename, onSaveRename, onCancelRename, onDelete,
-  isAdding, onToggleAdd, addSearch, setAddSearch, onAdd, onRemove,
+  isAdding, onToggleAdd, addSearch, setAddSearch, onAdd, onRemove, onCreate,
 }: {
   team: RiseTeam
   members: RiseCompetitor[]
@@ -309,8 +324,18 @@ function TeamCard({
   setAddSearch: (v: string) => void
   onAdd: (competitorId: string) => void
   onRemove: (competitorId: string) => void
+  onCreate: (name: string, gender: 'M' | 'F') => void
 }) {
   const addable = unassigned.filter(c => c.name.toLowerCase().includes(addSearch.trim().toLowerCase()))
+  const [newName, setNewName] = useState('')
+  const [newGender, setNewGender] = useState<'M' | 'F'>('M')
+
+  function submitNew(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newName.trim()) return
+    onCreate(newName, newGender)
+    setNewName('')
+  }
   return (
     <div className="group/card flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
       {/* Header */}
@@ -367,11 +392,10 @@ function TeamCard({
           <UserPlus size={13} /> {isAdding ? 'Done' : 'Add member'}
         </button>
         {isAdding && (
-          <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-950/50 p-2">
-            {unassigned.length === 0 ? (
-              <p className="text-xs text-zinc-600 px-1 py-1">No unassigned athletes left.</p>
-            ) : (
-              <>
+          <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-950/50 p-2 space-y-2">
+            {/* Pick an existing unassigned athlete */}
+            {unassigned.length > 0 && (
+              <div>
                 {unassigned.length > 6 && (
                   <div className="flex items-center gap-2 rounded-md bg-zinc-800 border border-zinc-700 px-2 mb-1.5">
                     <Search size={13} className="text-zinc-500" />
@@ -392,8 +416,41 @@ function TeamCard({
                   ))}
                   {addable.length === 0 && <li className="px-2 py-2 text-center text-zinc-600 text-xs">No match.</li>}
                 </ul>
-              </>
+              </div>
             )}
+
+            {/* Create a brand-new athlete on this team */}
+            <form onSubmit={submitNew} className={`flex items-center gap-1.5 ${unassigned.length > 0 ? 'pt-2 border-t border-zinc-800/70' : ''}`}>
+              <input
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                placeholder="New athlete name…"
+                className="flex-1 min-w-0 bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs text-white outline-none focus:border-[#2f5fe0] placeholder:text-zinc-600"
+              />
+              <div className="flex rounded overflow-hidden border border-zinc-700 shrink-0">
+                {(['M', 'F'] as const).map(g => (
+                  <button
+                    type="button"
+                    key={g}
+                    onClick={() => setNewGender(g)}
+                    className={`px-2 py-1.5 text-xs font-bold transition-colors ${
+                      newGender === g
+                        ? g === 'F' ? 'bg-pink-500/20 text-pink-300' : 'bg-sky-500/20 text-sky-300'
+                        : 'bg-zinc-800 text-zinc-500 hover:text-zinc-300'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="submit"
+                disabled={!newName.trim() || busy}
+                className="flex items-center gap-1 px-2 py-1.5 bg-[#2f5fe0] hover:bg-[#2348b8] disabled:opacity-50 text-white text-xs font-semibold rounded transition-colors shrink-0"
+              >
+                <UserPlus size={12} /> Add
+              </button>
+            </form>
           </div>
         )}
       </div>
