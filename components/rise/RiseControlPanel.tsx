@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Minus, Plus, Play, Flag, ListPlus, RotateCcw, AlertTriangle, UserCheck, Search, Save, Pencil } from 'lucide-react'
+import { Minus, Plus, Play, Flag, ListPlus, RotateCcw, AlertTriangle, UserCheck, Search, Save, Pencil, Venus } from 'lucide-react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT, adjustCounter } from '@/lib/rise'
 import { rankEntries, entryValue, formatMs } from '@/types/rise'
 import { RiseWaveControl } from './RiseWaveControl'
+import { eventShowsWomen } from './RiseLeaderboard'
 import type {
   RiseCompetitor, RiseEntry, RiseEvent, RiseRound, RiseScoringMode, RiseStatus, RiseTeam,
 } from '@/types/rise'
