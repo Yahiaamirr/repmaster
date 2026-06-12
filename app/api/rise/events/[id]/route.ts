@@ -100,3 +100,18 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   return NextResponse.json({ slug: existing.slug })
 }
+
+// Delete a RISE event (admin only). The event's teams, competitors, rounds,
+// entries and judge tokens are removed automatically via on-delete cascade.
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Not authorized.' }, { status: 401 })
+
+  const { error } = await supabase.from('rise_events').delete().eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  return NextResponse.json({ ok: true })
+}

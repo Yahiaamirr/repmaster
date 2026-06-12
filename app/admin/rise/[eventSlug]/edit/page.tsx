@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Trash2, ChevronLeft } from 'lucide-react'
+import { Plus, Trash2, ChevronLeft, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import type { RiseEvent, RiseRound, RiseScoringMode } from '@/types/rise'
 
@@ -42,6 +42,7 @@ export default function EditRiseEventPage() {
   const [rounds, setRounds] = useState<RoundRow[]>([])
 
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
 
   // Load the event + rounds and pre-fill the form.
@@ -100,6 +101,26 @@ export default function EditRiseEventPage() {
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to save changes')
       setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!eventId) return
+    const ok = window.confirm(
+      `Delete “${name}”?\n\nThis permanently removes the event and all of its athletes, teams, rounds, scores and judge links. This cannot be undone.`
+    )
+    if (!ok) return
+    setDeleting(true)
+    setError('')
+    try {
+      const res = await fetch(`/api/rise/events/${eventId}`, { method: 'DELETE' })
+      const payload = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(payload.error || 'Failed to delete event')
+      router.push('/admin/rise')
+      router.refresh()
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete event')
+      setDeleting(false)
     }
   }
 
@@ -200,6 +221,27 @@ export default function EditRiseEventPage() {
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
       </form>
+
+      {/* Danger zone */}
+      <div className="mt-10">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-red-400 uppercase tracking-wider mb-4">
+          <AlertTriangle size={15} /> Danger Zone
+        </h2>
+        <div className="bg-zinc-900 border border-red-500/30 rounded-xl p-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-white">Delete this event</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Removes the event and all its athletes, teams, rounds, scores and judge links. Cannot be undone.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
+          >
+            <Trash2 size={15} /> {deleting ? 'Deleting…' : 'Delete Event'}
+          </button>
+        </div>
+      </div>
 
       <style jsx>{`
         .input {
