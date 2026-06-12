@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { RiseJudge } from '@/components/rise/RiseJudge'
 import { ENTRY_SELECT } from '@/lib/rise'
-import type { RiseCompetitor, RiseEntry, RiseEvent, RiseJudgeToken } from '@/types/rise'
+import type { RiseCompetitor, RiseEntry, RiseEvent, RiseJudgeToken, RiseTeam } from '@/types/rise'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,10 +41,11 @@ export default async function RiseJudgePage({ params }: { params: Promise<{ toke
     )
   }
 
-  // Event-scoped token → roster picker (one device scores many athletes).
-  const [{ data: competitors }, { data: entries }] = await Promise.all([
+  // Event-scoped token → roster picker (one device scores many athletes/teams).
+  const [{ data: competitors }, { data: entries }, { data: teams }] = await Promise.all([
     supabase.from('rise_competitors').select('*').eq('event_id', event.id).order('name'),
     supabase.from('rise_entries').select(ENTRY_SELECT).eq('event_id', event.id),
+    supabase.from('rise_teams').select('*').eq('event_id', event.id).order('display_order'),
   ])
 
   return (
@@ -55,6 +56,7 @@ export default async function RiseJudgePage({ params }: { params: Promise<{ toke
       scope={scope}
       initialEntries={(entries as RiseEntry[] | null) ?? []}
       competitors={(competitors as RiseCompetitor[] | null) ?? []}
+      teams={(teams as RiseTeam[] | null) ?? []}
     />
   )
 }

@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { Radio, Lock, MonitorSmartphone, UserRound } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { RiseCompetitor, RiseEntry, RiseEvent } from '@/types/rise'
+import type { RiseCompetitor, RiseEntry, RiseEvent, RiseTeam } from '@/types/rise'
 import { RiseJudgeClient } from './RiseJudgeClient'
 import { RiseJudgeRoster } from './RiseJudgeRoster'
+import { RiseJudgeTeamRoster } from './RiseJudgeTeamRoster'
 import { brandVars } from '@/lib/rise-theme'
 import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG } from './RiseBrand'
 
@@ -34,6 +35,7 @@ export function RiseJudge({
   scope,
   initialEntries,
   competitors,
+  teams = [],
 }: {
   token: string
   event: RiseEvent
@@ -41,6 +43,7 @@ export function RiseJudge({
   scope: { team_id?: string; competitor_id?: string }
   initialEntries: RiseEntry[]
   competitors: RiseCompetitor[]
+  teams?: RiseTeam[]
 }) {
   const supabase = createClient()
   const nameKey = `rise-judge-name-${token}`
@@ -217,6 +220,10 @@ export function RiseJudge({
   // ── This device holds the lock → render the judge UI ──
   if (mode === 'scoped') {
     return <RiseJudgeClient event={event} token={token} label={name} scope={scope} initialEntries={initialEntries} />
+  }
+  // Team-timed events (e.g. Hyrox): pick a team, not an individual athlete.
+  if (event.config.team_timed) {
+    return <RiseJudgeTeamRoster event={event} token={token} label={name} teams={teams} competitors={competitors} initialEntries={initialEntries} />
   }
   return <RiseJudgeRoster event={event} token={token} label={name} competitors={competitors} initialEntries={initialEntries} />
 }
