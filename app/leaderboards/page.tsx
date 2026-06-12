@@ -7,12 +7,14 @@ import { RiseWordmark } from '@/components/rise/RiseBrand'
 
 export const dynamic = 'force-dynamic'
 
-const LOGOS: Record<string, { src: string; bg: string }> = {
-  'rise-battle-cycles':     { src: '/rise/rise-logo.png',    bg: '#000000' },
-  'evolve-deadlift-ladder': { src: '/rise/evolve-logo.webp', bg: '#ffffff' },
-  'lftd-hyrox':             { src: '/rise/lftd-logo.jpg',    bg: '#d4e84a' },
-  'turbo-deadhang':         { src: '/rise/turbo-logo.jpg',   bg: '#000000' },
-  'rlntlss-box-jumps':      { src: '/rise/rlntlss-logo.png', bg: '#000000' },
+const LOGOS: Record<string, { src: string; bg: string; contain?: boolean }> = {
+  'rise-battle-cycles':                    { src: '/rise/rise-logo.png',    bg: '#000000' },
+  'rise-ring-pushups-challenge-mqb12k1g':  { src: '/rise/rise-logo.png',    bg: '#000000' },
+  'evolve-deadlift-ladder':                { src: '/rise/evolve-logo.webp', bg: '#ffffff', contain: true },
+  'lftd-hyrox':                            { src: '/rise/lftd-logo.jpg',    bg: '#d4e84a' },
+  'turbo-deadhang':                        { src: '/rise/turbo-logo.jpg',   bg: '#000000' },
+  'rlntlss-box-jumps':                     { src: '/rise/rlntlss-logo.png', bg: '#000000' },
+  'rltnlss-mqayem06':                      { src: '/rise/rlntlss-logo.png', bg: '#000000' },
 }
 
 // Per-event accent, mirroring each board's sponsor theme.
@@ -61,7 +63,13 @@ export default async function LeaderboardsPage() {
                 style={{ background: LOGOS[ev.slug]?.bg ?? `color-mix(in srgb, ${accent} 15%, transparent)` }}
               >
                 {LOGOS[ev.slug] ? (
-                  <Image src={LOGOS[ev.slug].src} alt={ev.name} width={44} height={44} className="w-full h-full object-cover" />
+                  <Image
+                    src={LOGOS[ev.slug].src}
+                    alt={ev.name}
+                    width={44}
+                    height={44}
+                    className={`w-full h-full ${LOGOS[ev.slug].contain ? 'object-contain p-1' : 'object-cover'}`}
+                  />
                 ) : null}
               </span>
               <div className="flex-1 min-w-0">
