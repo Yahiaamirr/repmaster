@@ -284,8 +284,8 @@ export function Header({ event, roundName, theme }: { event: RiseEvent; roundNam
           )}
           {isSassic && (
             <>
-              <span className="text-zinc-700 text-sm">×</span>
-              <SassicMark className="h-10 sm:h-12 w-auto" />
+              <span className="text-[#0a0a0a]/40 text-sm">×</span>
+              <SassicMark className="h-14 sm:h-18 w-auto mix-blend-multiply" />
             </>
           )}
         </div>
