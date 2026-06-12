@@ -180,7 +180,7 @@ function ActiveAttemptState({
       {/* Athlete info */}
       <div className="px-6 py-8 text-center border-b border-zinc-800">
         {athlete.category && (
-          <p className="text-[#e8440a] text-xs font-bold tracking-widest uppercase mb-2">
+          <p className="text-[#7c3aed] text-xs font-bold tracking-widest uppercase mb-2">
             {athlete.category.name}
           </p>
         )}
@@ -194,7 +194,7 @@ function ActiveAttemptState({
           </span>
         </div>
         {attempt.declared_weight && (
-          <p className="text-5xl font-black text-[#e8440a] mt-4">
+          <p className="text-5xl font-black text-[#7c3aed] mt-4">
             {attempt.declared_weight}
             <span className="text-xl text-zinc-400 ml-1">kg</span>
           </p>

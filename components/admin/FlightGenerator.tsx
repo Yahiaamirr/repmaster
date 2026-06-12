@@ -45,7 +45,7 @@ export function FlightGenerator({
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
       <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
-        <Shuffle size={16} className="text-[#e8440a]" />
+        <Shuffle size={16} className="text-[#7c3aed]" />
         Generate Flights
       </h2>
       <p className="text-zinc-400 text-xs mb-4">
@@ -80,7 +80,7 @@ export function FlightGenerator({
         <button
           onClick={generate}
           disabled={loading || !eventTypeId}
-          className="w-full py-2 bg-[#e8440a] hover:bg-[#c73a08] disabled:opacity-50 text-white font-semibold rounded-lg transition-colors text-sm"
+          className="w-full py-2 bg-[#7c3aed] hover:bg-[#6d28d9] disabled:opacity-50 text-white font-semibold rounded-lg transition-colors text-sm"
         >
           {loading ? 'Generating...' : 'Generate Flights'}
         </button>
@@ -97,7 +97,7 @@ export function FlightGenerator({
           font-size: 13px;
           outline: none;
         }
-        .input:focus { border-color: #e8440a; }
+        .input:focus { border-color: #7c3aed; }
         .label { display: block; font-size: 12px; font-weight: 500; color: #9ca3af; margin-bottom: 4px; }
       `}</style>
     </div>

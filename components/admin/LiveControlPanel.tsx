@@ -144,16 +144,16 @@ export function LiveControlPanel({
     <div className="space-y-6">
       {/* Now on Platform banner */}
       {activeAthleteId && (
-        <div className="bg-[#e8440a]/10 border border-[#e8440a]/40 rounded-xl p-4 flex items-center gap-3">
-          <Radio size={18} className="text-[#e8440a] animate-pulse" />
+        <div className="bg-[#7c3aed]/10 border border-[#7c3aed]/40 rounded-xl p-4 flex items-center gap-3">
+          <Radio size={18} className="text-[#7c3aed] animate-pulse" />
           <div>
-            <div className="text-xs text-[#e8440a] font-semibold uppercase tracking-wider">Now on Platform</div>
+            <div className="text-xs text-[#7c3aed] font-semibold uppercase tracking-wider">Now on Platform</div>
             <div className="text-white font-bold">{activeAthleteName ?? 'Unknown'}</div>
           </div>
           {activeAttempt && (
             <div className="ml-auto text-right">
               <div className="text-xs text-zinc-400">Attempt {activeAttempt.attempt_number}</div>
-              <div className="text-[#e8440a] font-bold">{activeAttempt.declared_weight ?? '—'} kg</div>
+              <div className="text-[#7c3aed] font-bold">{activeAttempt.declared_weight ?? '—'} kg</div>
             </div>
           )}
         </div>
@@ -265,7 +265,7 @@ function FlightAccordion({
         onClick={onToggle}
         className="w-full flex items-center justify-between px-4 py-3 hover:bg-zinc-800 transition-colors"
       >
-        <span className="font-bold text-[#e8440a]">Flight {flight.name}</span>
+        <span className="font-bold text-[#7c3aed]">Flight {flight.name}</span>
         <div className="flex items-center gap-2 text-zinc-400 text-sm">
           <span>{flight.flight_athletes.length} athletes</span>
           {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -285,12 +285,12 @@ function FlightAccordion({
               return (
                 <div
                   key={fa.id}
-                  className={`border-b border-zinc-800/50 last:border-0 p-4 ${isActive ? 'bg-[#e8440a]/5' : ''}`}
+                  className={`border-b border-zinc-800/50 last:border-0 p-4 ${isActive ? 'bg-[#7c3aed]/5' : ''}`}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-zinc-500 text-xs w-5">{i + 1}</span>
-                      <span className={`font-semibold ${isActive ? 'text-[#e8440a]' : 'text-white'}`}>
+                      <span className={`font-semibold ${isActive ? 'text-[#7c3aed]' : 'text-white'}`}>
                         {athlete.name}
                       </span>
                       {athlete.category && (
@@ -299,7 +299,7 @@ function FlightAccordion({
                         </span>
                       )}
                       {isActive && (
-                        <span className="text-xs bg-[#e8440a]/20 text-[#e8440a] border border-[#e8440a]/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="text-xs bg-[#7c3aed]/20 text-[#7c3aed] border border-[#7c3aed]/30 px-2 py-0.5 rounded-full flex items-center gap-1">
                           <Radio size={8} className="animate-pulse" />
                           ON PLATFORM
                         </span>
@@ -309,7 +309,7 @@ function FlightAccordion({
                       onClick={() => onSetActive(athlete, flight.id)}
                       className={`text-xs px-3 py-1.5 rounded-md font-medium transition-colors ${
                         isActive
-                          ? 'bg-[#e8440a] text-white'
+                          ? 'bg-[#7c3aed] text-white'
                           : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
                       }`}
                     >
@@ -336,7 +336,7 @@ function FlightAccordion({
                                 step="0.5"
                                 defaultValue={attempt.declared_weight ?? ''}
                                 onBlur={e => onUpdateWeight(attempt.id, e.target.value)}
-                                className="w-20 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-xs text-white outline-none focus:border-[#e8440a]"
+                                className="w-20 bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-xs text-white outline-none focus:border-[#7c3aed]"
                                 placeholder="weight"
                               />
                               <span className="text-xs text-zinc-500">kg</span>

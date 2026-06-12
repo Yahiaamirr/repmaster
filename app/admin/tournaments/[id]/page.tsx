@@ -121,10 +121,10 @@ function NavCard({
     <Link
       href={href}
       className={`block bg-zinc-900 hover:bg-zinc-800 border rounded-xl p-5 transition-all group ${
-        highlight ? 'border-[#e8440a]/50 hover:border-[#e8440a]' : 'border-zinc-800 hover:border-zinc-700'
+        highlight ? 'border-[#7c3aed]/50 hover:border-[#7c3aed]' : 'border-zinc-800 hover:border-zinc-700'
       }`}
     >
-      <div className={`mb-3 ${highlight ? 'text-[#e8440a]' : 'text-zinc-400 group-hover:text-white'} transition-colors`}>
+      <div className={`mb-3 ${highlight ? 'text-[#7c3aed]' : 'text-zinc-400 group-hover:text-white'} transition-colors`}>
         {icon}
       </div>
       <div className="flex items-center gap-2 mb-1">

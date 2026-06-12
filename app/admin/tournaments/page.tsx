@@ -20,7 +20,7 @@ export default async function TournamentsPage() {
         </div>
         <Link
           href="/admin/tournaments/new"
-          className="flex items-center gap-2 px-4 py-2 bg-[#e8440a] hover:bg-[#c73a08] text-white font-semibold rounded-lg transition-colors text-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold rounded-lg transition-colors text-sm"
         >
           <Plus size={15} />
           New Tournament
@@ -85,7 +85,7 @@ function EmptyState() {
       <p className="text-zinc-400 text-sm mb-6">Create your first competition to get started</p>
       <Link
         href="/admin/tournaments/new"
-        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#e8440a] hover:bg-[#c73a08] text-white font-semibold rounded-lg transition-colors text-sm"
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold rounded-lg transition-colors text-sm"
       >
         <Plus size={15} />
         Create Tournament

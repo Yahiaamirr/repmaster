@@ -64,8 +64,8 @@ export function FlightList({
                 .sort((a, b) => a.platform_order - b.platform_order)
                 .map(flight => (
                   <div key={flight.id} className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-                    <div className="px-4 py-2.5 bg-[#e8440a]/10 border-b border-zinc-800 flex items-center justify-between">
-                      <span className="font-bold text-[#e8440a] text-sm">Flight {flight.name}</span>
+                    <div className="px-4 py-2.5 bg-[#7c3aed]/10 border-b border-zinc-800 flex items-center justify-between">
+                      <span className="font-bold text-[#7c3aed] text-sm">Flight {flight.name}</span>
                       <span className="text-xs text-zinc-500">{flight.flight_athletes.length} athletes</span>
                     </div>
                     <table className="w-full text-sm">
@@ -96,7 +96,7 @@ export function FlightList({
                                 </td>
                                 <td className="px-4 py-2.5 text-right">
                                   {opener ? (
-                                    <span className="text-[#e8440a] font-semibold">{opener}</span>
+                                    <span className="text-[#7c3aed] font-semibold">{opener}</span>
                                   ) : (
                                     <span className="text-zinc-600">—</span>
                                   )}

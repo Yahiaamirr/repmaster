@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-black">
-            <span className="text-[#e8440a]">Rep</span>Master
+            Nezam <span className="text-[#7c3aed]">IT</span>
           </h1>
           <p className="text-zinc-400 text-sm mt-1">Admin access</p>
         </div>
@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
               type="email"
               required
               autoFocus
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#e8440a] transition-colors"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#7c3aed] transition-colors"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
             <input
               type="password"
               required
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#e8440a] transition-colors"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-[#7c3aed] transition-colors"
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-[#e8440a] hover:bg-[#c73a08] disabled:opacity-50 text-white font-bold rounded-lg transition-colors text-sm"
+            className="w-full py-2.5 bg-[#7c3aed] hover:bg-[#6d28d9] disabled:opacity-50 text-white font-bold rounded-lg transition-colors text-sm"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>

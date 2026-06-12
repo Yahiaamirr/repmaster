@@ -111,7 +111,7 @@ export function AthleteTable({
                         <td key={et.id} className="px-3 py-3 text-center">
                           {editingId === athlete.id ? (
                             <input
-                              className="w-16 bg-zinc-800 border border-zinc-600 rounded px-1.5 py-1 text-xs text-center text-white outline-none focus:border-[#e8440a]"
+                              className="w-16 bg-zinc-800 border border-zinc-600 rounded px-1.5 py-1 text-xs text-center text-white outline-none focus:border-[#7c3aed]"
                               type="number"
                               step="0.5"
                               value={editOpeners[et.id] ?? ''}

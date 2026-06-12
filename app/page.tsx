@@ -5,12 +5,12 @@ export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
       <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 bg-[#e8440a]/10 border border-[#e8440a]/30 text-[#e8440a] text-xs font-bold tracking-[4px] uppercase px-4 py-2 rounded-full mb-8">
-          <span className="w-1.5 h-1.5 bg-[#e8440a] rounded-full animate-pulse" />
+        <div className="inline-flex items-center gap-2 bg-[#7c3aed]/10 border border-[#7c3aed]/30 text-[#7c3aed] text-xs font-bold tracking-[4px] uppercase px-4 py-2 rounded-full mb-8">
+          <span className="w-1.5 h-1.5 bg-[#7c3aed] rounded-full animate-pulse" />
           Competition Platform
         </div>
         <h1 className="text-6xl font-black tracking-tight mb-4">
-          Rep<span className="text-[#e8440a]">Master</span>
+          Nezam <span className="text-[#7c3aed]">IT</span>
         </h1>
         <p className="text-zinc-400 text-lg max-w-md mx-auto">
           Real-time tournament management for calisthenics &amp; strength competitions.
@@ -44,7 +44,7 @@ export default function HomePage() {
       <div className="flex flex-col sm:flex-row gap-4">
         <Link
           href="/admin/tournaments"
-          className="px-8 py-3.5 bg-[#e8440a] hover:bg-[#c73a08] text-white font-bold rounded-lg transition-colors text-center"
+          className="px-8 py-3.5 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold rounded-lg transition-colors text-center"
         >
           Admin Dashboard
         </Link>
@@ -70,7 +70,7 @@ function FeatureCard({
 }) {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex gap-4 items-start">
-      <div className="text-[#e8440a] mt-0.5 shrink-0">{icon}</div>
+      <div className="text-[#7c3aed] mt-0.5 shrink-0">{icon}</div>
       <div>
         <div className="font-semibold text-white mb-1">{title}</div>
         <div className="text-zinc-400 text-sm">{description}</div>

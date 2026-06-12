@@ -217,7 +217,7 @@ export default function NewTournamentPage() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-3 bg-[#e8440a] hover:bg-[#c73a08] disabled:opacity-50 text-white font-bold rounded-lg transition-colors"
+          className="w-full py-3 bg-[#7c3aed] hover:bg-[#6d28d9] disabled:opacity-50 text-white font-bold rounded-lg transition-colors"
         >
           {saving ? 'Creating...' : 'Create Tournament'}
         </button>
@@ -236,7 +236,7 @@ export default function NewTournamentPage() {
           transition: border-color 0.15s;
         }
         .input:focus {
-          border-color: #e8440a;
+          border-color: #7c3aed;
         }
       `}</style>
     </div>

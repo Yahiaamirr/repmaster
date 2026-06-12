@@ -165,8 +165,8 @@ export function LeaderboardClient({
     <div className="min-h-screen bg-[#0d0800] text-white">
       {/* Header */}
       <header className="text-center py-8 px-4 border-b border-[#2a1a00]">
-        <div className="inline-flex items-center gap-2 text-[#e8440a] text-xs font-bold tracking-[4px] uppercase mb-4">
-          <span className="w-1.5 h-1.5 bg-[#e8440a] rounded-full animate-pulse" />
+        <div className="inline-flex items-center gap-2 text-[#7c3aed] text-xs font-bold tracking-[4px] uppercase mb-4">
+          <span className="w-1.5 h-1.5 bg-[#7c3aed] rounded-full animate-pulse" />
           LIVE
         </div>
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">{tournament.name}</h1>
@@ -179,11 +179,11 @@ export function LeaderboardClient({
 
       {/* On Platform panel */}
       <div className="max-w-lg mx-auto px-4 py-6">
-        <p className="text-xs font-bold text-[#e8440a] tracking-[4px] uppercase text-center mb-3">Now on Platform</p>
+        <p className="text-xs font-bold text-[#7c3aed] tracking-[4px] uppercase text-center mb-3">Now on Platform</p>
         {onPlatformName ? (
-          <div className="bg-[#1a0800] border-2 border-[#e8440a]/60 rounded-2xl p-6 text-center">
+          <div className="bg-[#1a0800] border-2 border-[#7c3aed]/60 rounded-2xl p-6 text-center">
             {onPlatformCategory && (
-              <p className="text-[#e8440a] text-xs font-semibold tracking-widest uppercase mb-2">{onPlatformCategory}</p>
+              <p className="text-[#7c3aed] text-xs font-semibold tracking-widest uppercase mb-2">{onPlatformCategory}</p>
             )}
             <p className="text-3xl font-black text-white mb-3">{onPlatformName}</p>
             {activeAttempt && (
@@ -191,7 +191,7 @@ export function LeaderboardClient({
                 <p className="text-zinc-400 text-xs uppercase tracking-widest mb-1">
                   {activeAttempt.event_type?.name} · Attempt {activeAttempt.attempt_number}
                 </p>
-                <p className="text-[#e8440a] text-4xl font-black">
+                <p className="text-[#7c3aed] text-4xl font-black">
                   {activeAttempt.declared_weight ?? '—'}
                   <span className="text-lg ml-1 text-zinc-400">kg</span>
                 </p>
@@ -241,15 +241,15 @@ function CategoryCard({
 }) {
   return (
     <div className="bg-[#120a00] border border-[#2a1200] rounded-xl overflow-hidden">
-      <div className="bg-[#e8440a] px-4 py-2.5 text-center">
+      <div className="bg-[#7c3aed] px-4 py-2.5 text-center">
         <span className="font-black text-white text-sm tracking-wider uppercase">{category.name}</span>
       </div>
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-[#2a1200]">
-            <th className="text-left px-3 py-2 text-[#e8440a] font-semibold text-xs">#</th>
-            <th className="text-left px-3 py-2 text-[#e8440a] font-semibold text-xs">Athlete</th>
-            <th className="text-right px-3 py-2 text-[#e8440a] font-semibold text-xs">Total</th>
+            <th className="text-left px-3 py-2 text-[#7c3aed] font-semibold text-xs">#</th>
+            <th className="text-left px-3 py-2 text-[#7c3aed] font-semibold text-xs">Athlete</th>
+            <th className="text-right px-3 py-2 text-[#7c3aed] font-semibold text-xs">Total</th>
           </tr>
         </thead>
         <tbody>
@@ -262,12 +262,12 @@ function CategoryCard({
               <tr
                 key={ath.id}
                 className={`border-b border-[#1a0e00] last:border-0 transition-colors ${
-                  isActive ? 'bg-[#e8440a]/10' : i % 2 === 0 ? 'bg-[#0f0600]' : ''
+                  isActive ? 'bg-[#7c3aed]/10' : i % 2 === 0 ? 'bg-[#0f0600]' : ''
                 }`}
               >
                 <td className="px-3 py-2.5 text-center text-sm">{rankDisplay}</td>
                 <td className="px-3 py-2.5">
-                  <div className={`font-semibold ${isActive ? 'text-[#e8440a]' : 'text-white'}`}>
+                  <div className={`font-semibold ${isActive ? 'text-[#7c3aed]' : 'text-white'}`}>
                     {isActive ? '▶ ' : ''}{ath.name}
                   </div>
                   {ath.total > 0 && Object.keys(ath.scoresByEvent).length > 0 && (
@@ -281,7 +281,7 @@ function CategoryCard({
                 </td>
                 <td className="px-3 py-2.5 text-right">
                   {ath.total > 0 ? (
-                    <span className="font-black text-[#e8440a]">{ath.total}</span>
+                    <span className="font-black text-[#7c3aed]">{ath.total}</span>
                   ) : (
                     <span className="text-zinc-700">—</span>
                   )}

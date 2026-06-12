@@ -76,7 +76,7 @@ export function AddAthleteForm({
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
       <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
-        <UserPlus size={16} className="text-[#e8440a]" />
+        <UserPlus size={16} className="text-[#7c3aed]" />
         Add Athlete
       </h2>
       <form onSubmit={handleAdd} className="space-y-3">
@@ -134,7 +134,7 @@ export function AddAthleteForm({
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-2 bg-[#e8440a] hover:bg-[#c73a08] disabled:opacity-50 text-white font-semibold rounded-lg transition-colors text-sm"
+          className="w-full py-2 bg-[#7c3aed] hover:bg-[#6d28d9] disabled:opacity-50 text-white font-semibold rounded-lg transition-colors text-sm"
         >
           {saving ? 'Adding...' : 'Add Athlete'}
         </button>
@@ -151,7 +151,7 @@ export function AddAthleteForm({
           font-size: 13px;
           outline: none;
         }
-        .input:focus { border-color: #e8440a; }
+        .input:focus { border-color: #7c3aed; }
         .label {
           display: block;
           font-size: 12px;

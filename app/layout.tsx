@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'RepMaster — Tournament Platform',
+  title: 'Nezam IT — Tournament Platform',
   description: 'Real-time calisthenics & strength competition management',
 }
 
