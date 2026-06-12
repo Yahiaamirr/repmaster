@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { Radio, ExternalLink, ChevronLeft, QrCode, Pencil } from 'lucide-react'
 import { RiseTokenManager } from '@/components/rise/RiseTokenManager'
 import { RiseRoster } from '@/components/rise/RiseRoster'
+import { RiseTeams } from '@/components/rise/RiseTeams'
 import { RiseRegisterQR } from '@/components/rise/RiseRegisterQR'
 import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG } from '@/components/rise/RiseBrand'
 import type { RiseCompetitor, RiseEvent, RiseJudgeToken, RiseTeam } from '@/types/rise'
@@ -116,7 +117,7 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
                   </div>
                 </div>
               ))}
-              <p className="text-xs text-zinc-600 pt-1">RISE teams are fixed and can’t be edited here.</p>
+              <p className="text-xs text-zinc-600 pt-1">Manage teams and assignments in the Teams section below.</p>
             </div>
           ) : (
             <RiseRoster eventId={ev.id} initialCompetitors={comps} />
@@ -138,6 +139,11 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
           {/* Judge links */}
           <RiseTokenManager event={ev} teams={teamList} initialTokens={(tokens as RiseJudgeToken[] | null) ?? []} />
         </div>
+      </div>
+
+      {/* Teams — group athletes into teams */}
+      <div className="mt-6">
+        <RiseTeams eventId={ev.id} initialTeams={teamList} initialCompetitors={comps} />
       </div>
     </div>
   )
