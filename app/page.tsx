@@ -55,11 +55,6 @@ export default function HomePage() {
           New Tournament
         </Link>
       </div>
-
-      <p className="mt-8 text-zinc-600 text-sm">
-        First time? Set your Supabase keys in{' '}
-        <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">.env.local</code>
-      </p>
     </main>
   )
 }
