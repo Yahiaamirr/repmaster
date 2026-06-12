@@ -3,11 +3,12 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { Radio, ExternalLink, ChevronLeft, QrCode, Pencil } from 'lucide-react'
 import { RiseTokenManager } from '@/components/rise/RiseTokenManager'
+import { RiseJudgeReport } from '@/components/rise/RiseJudgeReport'
 import { RiseRoster } from '@/components/rise/RiseRoster'
 import { RiseTeams } from '@/components/rise/RiseTeams'
 import { RiseRegisterQR } from '@/components/rise/RiseRegisterQR'
 import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG } from '@/components/rise/RiseBrand'
-import type { RiseCompetitor, RiseEvent, RiseJudgeToken, RiseTeam } from '@/types/rise'
+import type { RiseCompetitor, RiseEvent, RiseJudgeLog, RiseJudgeToken, RiseTeam } from '@/types/rise'
 import { brandVars } from '@/lib/rise-theme'
 
 export const dynamic = 'force-dynamic'
@@ -20,10 +21,15 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
   if (!event) notFound()
   const ev = event as RiseEvent
 
-  const [{ data: teams }, { data: competitors }, { data: tokens }] = await Promise.all([
+  const [{ data: teams }, { data: competitors }, { data: tokens }, { data: judgeLog }] = await Promise.all([
     supabase.from('rise_teams').select('*').eq('event_id', ev.id).order('display_order'),
     supabase.from('rise_competitors').select('*').eq('event_id', ev.id).order('name'),
     supabase.from('rise_judge_tokens').select('*').eq('event_id', ev.id).order('created_at'),
+    supabase
+      .from('rise_judge_log')
+      .select('*, competitor:rise_competitors(name, gender), team:rise_teams(name)')
+      .eq('event_id', ev.id)
+      .order('last_at', { ascending: false }),
   ])
 
   const teamList = (teams as RiseTeam[] | null) ?? []
@@ -138,6 +144,13 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
 
           {/* Judge links */}
           <RiseTokenManager event={ev} teams={teamList} initialTokens={(tokens as RiseJudgeToken[] | null) ?? []} />
+
+          {/* Judges & who they judged */}
+          <RiseJudgeReport
+            eventId={ev.id}
+            initialTokens={(tokens as RiseJudgeToken[] | null) ?? []}
+            initialLog={(judgeLog as RiseJudgeLog[] | null) ?? []}
+          />
         </div>
       </div>
 

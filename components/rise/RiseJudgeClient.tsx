@@ -1,9 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Clock, Radio } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { fetchScopedEntries, pickActiveEntry } from '@/lib/rise'
+import { fetchScopedEntries, logJudge, pickActiveEntry } from '@/lib/rise'
 import type { RiseEntry, RiseEvent } from '@/types/rise'
 import { brandVars } from '@/lib/rise-theme'
 import { JudgeCounter } from './JudgeCounter'
@@ -12,17 +12,28 @@ import { JudgeMeasure } from './JudgeMeasure'
 
 export function RiseJudgeClient({
   event,
+  token,
   label,
   scope,
   initialEntries,
 }: {
   event: RiseEvent
+  token: string
   label: string
   scope: { team_id?: string; competitor_id?: string }
   initialEntries: RiseEntry[]
 }) {
   const supabase = createClient()
   const [entry, setEntry] = useState<RiseEntry | null>(pickActiveEntry(initialEntries))
+  const loggedEntryId = useRef<string | null>(null)
+
+  // Record this judge against the athlete/team whenever the active entry changes.
+  useEffect(() => {
+    if (entry && entry.id !== loggedEntryId.current) {
+      loggedEntryId.current = entry.id
+      logJudge(supabase, token, entry.id)
+    }
+  }, [entry?.id, token])
 
   const reresolve = useCallback(async () => {
     const entries = await fetchScopedEntries(supabase, event.id, scope)

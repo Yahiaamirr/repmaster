@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Search, ChevronRight, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { ENTRY_SELECT } from '@/lib/rise'
+import { ENTRY_SELECT, logJudge } from '@/lib/rise'
 import { entryValue } from '@/types/rise'
 import type { RiseCompetitor, RiseEntry, RiseEvent, RiseGender } from '@/types/rise'
 import { JudgeCounter } from './JudgeCounter'
@@ -13,11 +13,13 @@ import { brandVars } from '@/lib/rise-theme'
 
 export function RiseJudgeRoster({
   event,
+  token,
   label,
   competitors,
   initialEntries,
 }: {
   event: RiseEvent
+  token: string
   label: string
   competitors: RiseCompetitor[]
   initialEntries: RiseEntry[]
@@ -58,6 +60,8 @@ export function RiseJudgeRoster({
         setEntries(prev => [...prev, entry as RiseEntry])
       }
     }
+    // Record who is judging this athlete (fire-and-forget).
+    if (entry) logJudge(supabase, token, entry.id)
     setSelectedId(c.id)
   }
 

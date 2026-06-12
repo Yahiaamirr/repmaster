@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Minus, Plus, Play, Flag, ListPlus, RotateCcw, AlertTriangle } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Minus, Plus, Play, Flag, ListPlus, RotateCcw, AlertTriangle, UserCheck, Search } from 'lucide-react'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT, adjustCounter } from '@/lib/rise'
 import { rankEntries, entryValue } from '@/types/rise'
@@ -64,6 +65,12 @@ export function RiseControlPanel({
   return (
     <div className="space-y-6">
       <StatusBar event={event} onSet={setStatus} onReset={resetEvent} busy={busy} />
+      <AttendancePanel
+        supabase={supabase}
+        teams={teams}
+        isTeam={event.is_team}
+        initialCompetitors={competitors}
+      />
       {event.is_team ? (
         <TeamControl
           event={event}
@@ -239,6 +246,111 @@ function TeamControl({
         )}
       </div>
     </>
+  )
+}
+
+// ── Attendance / check-in ───────────────────────────────────
+function AttendancePanel({
+  supabase, teams, isTeam, initialCompetitors,
+}: {
+  supabase: SupabaseClient
+  teams: RiseTeam[]
+  isTeam: boolean
+  initialCompetitors: RiseCompetitor[]
+}) {
+  const [comps, setComps] = useState<RiseCompetitor[]>(initialCompetitors)
+  const [q, setQ] = useState('')
+  const [open, setOpen] = useState(false)
+
+  const present = comps.filter(c => c.checked_in).length
+
+  async function toggle(c: RiseCompetitor) {
+    const next = !c.checked_in
+    const checked_in_at = next ? new Date().toISOString() : null
+    setComps(prev => prev.map(x => (x.id === c.id ? { ...x, checked_in: next, checked_in_at } : x)))
+    await supabase.from('rise_competitors').update({ checked_in: next, checked_in_at }).eq('id', c.id)
+  }
+
+  const filtered = useMemo(
+    () => comps.filter(c => c.name.toLowerCase().includes(q.trim().toLowerCase())),
+    [comps, q]
+  )
+  const teamName = (id: string | null) => teams.find(t => t.id === id)?.name ?? 'No team'
+
+  // Group by team for team events; otherwise one flat list.
+  const groups: { key: string; label: string | null; list: RiseCompetitor[] }[] = isTeam
+    ? teams.map(t => ({ key: t.id, label: t.name, list: filtered.filter(c => c.team_id === t.id) }))
+    : [{ key: 'all', label: null, list: filtered }]
+
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between gap-3 p-4 text-left"
+      >
+        <div className="flex items-center gap-2">
+          <UserCheck size={16} className="text-green-400" />
+          <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Check-in</h2>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-xs tabular-nums">
+            <span className="text-green-400 font-bold">{present}</span>
+            <span className="text-zinc-500"> / {comps.length} present</span>
+          </span>
+          <span className="text-xs text-zinc-500">{open ? 'Hide' : 'Show'}</span>
+        </div>
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4">
+          {comps.length > 8 && (
+            <div className="mb-3 flex items-center gap-2 rounded-lg bg-zinc-800 border border-zinc-700 px-3">
+              <Search size={15} className="text-zinc-500" />
+              <input
+                value={q}
+                onChange={e => setQ(e.target.value)}
+                placeholder="Search athlete…"
+                className="flex-1 bg-transparent py-2 text-sm text-white outline-none placeholder:text-zinc-600"
+              />
+            </div>
+          )}
+          <div className="space-y-3">
+            {groups.map(g => (
+              <div key={g.key}>
+                {g.label && <p className="text-xs font-bold text-[#4d7bff] mb-1.5">{g.label}</p>}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {g.list.map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => toggle(c)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-left transition-colors ${
+                        c.checked_in
+                          ? 'bg-green-500/10 border-green-500/40 text-white'
+                          : 'bg-zinc-800/60 border-zinc-700/60 text-zinc-400 hover:bg-zinc-800'
+                      }`}
+                    >
+                      <span
+                        className={`flex items-center justify-center h-5 w-5 rounded-full border shrink-0 ${
+                          c.checked_in ? 'bg-green-500 border-green-500 text-zinc-950' : 'border-zinc-600'
+                        }`}
+                      >
+                        {c.checked_in && <UserCheck size={12} />}
+                      </span>
+                      <span className={`text-[10px] font-bold w-3 ${c.gender === 'F' ? 'text-pink-400' : 'text-sky-400'}`}>{c.gender}</span>
+                      <span className="flex-1 min-w-0 text-sm truncate">{c.name}</span>
+                      {isTeam && !g.label && <span className="text-[10px] text-zinc-600">{teamName(c.team_id)}</span>}
+                    </button>
+                  ))}
+                  {g.list.length === 0 && (
+                    <p className="text-xs text-zinc-600 py-1">No athletes{g.label ? ' on this team' : ''}.</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
