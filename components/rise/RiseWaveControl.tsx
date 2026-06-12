@@ -2,14 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { Play, Flag, RotateCcw, Timer, Users, FastForward } from 'lucide-react'
+import { Play, Flag, RotateCcw, Timer, Users, FastForward, Ban, Plus, Minus } from 'lucide-react'
 import { ENTRY_SELECT, timerStart, timerStop, timerResume } from '@/lib/rise'
-import { formatMs, teamGenderOf, RISE_TIME_CAP_DEFAULT, RISE_WAVE_SIZE_DEFAULT } from '@/types/rise'
+import {
+  formatMs, formatPenalty, teamGenderOf, entryPenaltyMs, entryIsDnf, entryFinalMs,
+  RISE_TIME_CAP_DEFAULT, RISE_WAVE_SIZE_DEFAULT,
+} from '@/types/rise'
 import type { RiseCompetitor, RiseEntry, RiseEvent, RiseTeam } from '@/types/rise'
 
 // Team-timed control (e.g. Hyrox): teams ordered female-first, grouped into waves.
-// The operator starts a wave (both teams' timers); each team is timed to a cap and
-// finished individually. Multiple waves can run at once.
+// The operator starts a wave, finishes each team, and can apply time penalties or
+// DNF a team. A team that passes the time cap is auto-DNF'd.
 export function RiseWaveControl({
   event, teams, competitors, entries, setEntries, busy, setBusy, supabase,
 }: {
@@ -25,7 +28,6 @@ export function RiseWaveControl({
   const capSec = event.config.time_cap_sec ?? RISE_TIME_CAP_DEFAULT
   const waveSize = event.config.wave_size ?? RISE_WAVE_SIZE_DEFAULT
 
-  // Female teams first, then by display order; chunk into waves.
   const genderRank = (g: 'M' | 'F' | null) => (g === 'F' ? 0 : g === 'M' ? 1 : 2)
   const ordered = [...teams].sort(
     (a, b) =>
@@ -54,7 +56,7 @@ export function RiseWaveControl({
     setBusy(true)
     for (const t of wave) {
       const entry = await ensureEntry(t.id)
-      if (entry && !entry.timer_running && entry.time_ms == null) {
+      if (entry && !entryIsDnf(entry) && !entry.timer_running && entry.time_ms == null) {
         await timerStart(supabase, entry.id)
         const now = new Date().toISOString()
         setEntries(prev => prev.map(e => (e.id === entry.id ? { ...e, timer_running: true, timer_started_at: now, status: 'active' } : e)))
@@ -72,7 +74,6 @@ export function RiseWaveControl({
     if (data) setEntries(prev => prev.map(e => (e.id === entry.id ? (data as RiseEntry) : e)))
   }, [entries, supabase, setEntries])
 
-  // Continue a stopped team timer from its recorded time (after an accidental finish).
   async function resumeTeam(teamId: string) {
     const entry = entries.find(e => e.team_id === teamId)
     if (!entry || entry.time_ms == null) return
@@ -85,19 +86,43 @@ export function RiseWaveControl({
   async function resetTeam(teamId: string) {
     const entry = entries.find(e => e.team_id === teamId)
     if (!entry) return
-    setEntries(prev => prev.map(e => (e.id === entry.id ? { ...e, time_ms: null, timer_running: false, timer_started_at: null, status: 'pending' } : e)))
-    await supabase.from('rise_entries').update({ time_ms: null, timer_running: false, timer_started_at: null, status: 'pending' }).eq('id', entry.id)
+    setEntries(prev => prev.map(e => (e.id === entry.id ? { ...e, time_ms: null, timer_running: false, timer_started_at: null, status: 'pending', meta: {} } : e)))
+    await supabase.from('rise_entries').update({ time_ms: null, timer_running: false, timer_started_at: null, status: 'pending', meta: {} }).eq('id', entry.id)
   }
 
-  // Auto-finish a team whose timer reaches the cap.
-  const capRef = useRef(finishTeam)
-  capRef.current = finishTeam
+  const setDnf = useCallback(async (teamId: string, value: boolean) => {
+    const entry = entries.find(e => e.team_id === teamId)
+    if (!entry) return
+    const meta = { ...(entry.meta ?? {}), dnf: value }
+    const patch: Partial<RiseEntry> = { meta }
+    // DNF'ing a running team: keep their time by recording elapsed (capped), then stop.
+    if (value && entry.timer_running && entry.timer_started_at) {
+      patch.time_ms = Math.min(capSec * 1000, Math.max(0, Date.now() - new Date(entry.timer_started_at).getTime()))
+      patch.timer_running = false
+      patch.status = 'done'
+    }
+    setEntries(prev => prev.map(e => (e.id === entry.id ? { ...e, ...patch } : e)))
+    await supabase.from('rise_entries').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', entry.id)
+  }, [entries, supabase, setEntries, capSec])
+
+  async function adjustPenalty(teamId: string, deltaMs: number) {
+    const entry = entries.find(e => e.team_id === teamId)
+    if (!entry) return
+    const meta = { ...(entry.meta ?? {}), penalty_ms: entryPenaltyMs(entry) + deltaMs }
+    setEntries(prev => prev.map(e => (e.id === entry.id ? { ...e, meta } : e)))
+    await supabase.from('rise_entries').update({ meta, updated_at: new Date().toISOString() }).eq('id', entry.id)
+  }
+
+  // A running team that passes the time cap is auto-DNF'd.
+  const dnfRef = useRef(setDnf)
+  dnfRef.current = setDnf
   useEffect(() => {
     const id = setInterval(() => {
       for (const e of entries) {
-        if (e.timer_running && e.timer_started_at) {
-          const elapsed = Date.now() - new Date(e.timer_started_at).getTime()
-          if (elapsed >= capSec * 1000 && e.team_id) capRef.current(e.team_id)
+        if (e.timer_running && e.timer_started_at && e.team_id && !entryIsDnf(e)) {
+          if (Date.now() - new Date(e.timer_started_at).getTime() >= capSec * 1000) {
+            dnfRef.current(e.team_id, true)
+          }
         }
       }
     }, 1000)
@@ -121,13 +146,16 @@ export function RiseWaveControl({
           <span className="text-sm font-semibold">Wave control</span>
         </div>
         <span className="text-xs text-zinc-500">
-          {waveSize} teams / wave · {Math.round(capSec / 60)} min cap · female teams first
+          {waveSize} teams / wave · past {Math.round(capSec / 60)} min → auto-DNF · female teams first
         </span>
       </div>
 
       {waves.map((wave, wi) => {
         const anyRunning = wave.some(t => entryFor(t.id)?.timer_running)
-        const allStarted = wave.every(t => { const e = entryFor(t.id); return e && (e.timer_running || e.time_ms != null) })
+        const allStarted = wave.every(t => {
+          const e = entryFor(t.id)
+          return e && (e.timer_running || e.time_ms != null || entryIsDnf(e))
+        })
         return (
           <div key={wi} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
@@ -153,6 +181,8 @@ export function RiseWaveControl({
                   onFinish={() => finishTeam(t.id)}
                   onResume={() => resumeTeam(t.id)}
                   onReset={() => resetTeam(t.id)}
+                  onPenalty={(delta) => adjustPenalty(t.id, delta)}
+                  onDnf={(value) => setDnf(t.id, value)}
                 />
               ))}
             </div>
@@ -164,7 +194,7 @@ export function RiseWaveControl({
 }
 
 function TeamTimerCard({
-  team, gender, entry, capSec, onFinish, onResume, onReset,
+  team, gender, entry, capSec, onFinish, onResume, onReset, onPenalty, onDnf,
 }: {
   team: RiseTeam
   gender: 'M' | 'F' | null
@@ -173,38 +203,81 @@ function TeamTimerCard({
   onFinish: () => void
   onResume: () => void
   onReset: () => void
+  onPenalty: (deltaMs: number) => void
+  onDnf: (value: boolean) => void
 }) {
+  const dnf = entry ? entryIsDnf(entry) : false
+  const penalty = entry ? entryPenaltyMs(entry) : 0
   const done = entry?.time_ms != null
   const running = !!entry?.timer_running
+  const finalMs = entry ? entryFinalMs(entry) : null
+
   return (
-    <div className={`rounded-xl border p-4 ${done ? 'border-green-500/40 bg-green-500/5' : running ? 'border-[#2f5fe0]/50 bg-[#102047]' : 'border-zinc-800 bg-zinc-900'}`}>
+    <div className={`rounded-xl border p-4 ${dnf ? 'border-red-500/40 bg-red-500/5' : done ? 'border-green-500/40 bg-green-500/5' : running ? 'border-[#2f5fe0]/50 bg-[#102047]' : 'border-zinc-800 bg-zinc-900'}`}>
       <div className="flex items-center gap-2 mb-2">
         {gender && <span className={`text-[10px] font-bold ${gender === 'F' ? 'text-pink-400' : 'text-sky-400'}`}>{gender}</span>}
         <span className="font-bold text-white truncate">{team.name}</span>
+        {dnf && <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-500/15 px-1.5 py-0.5 rounded">DNF</span>}
       </div>
-      <div className="flex items-center justify-between">
-        <span className="text-3xl font-black tabular-nums text-white">
-          {running && entry?.timer_started_at
-            ? <LiveClock startedAt={entry.timer_started_at} capSec={capSec} />
-            : done ? formatMs(entry!.time_ms) : <span className="text-zinc-700">—</span>}
-        </span>
+
+      <div className="flex items-center justify-between mb-2">
+        <div className="min-w-0">
+          <span className="text-3xl font-black tabular-nums text-white block">
+            {dnf ? <span className="text-red-400 text-2xl">DNF</span>
+              : running && entry?.timer_started_at ? <LiveClock startedAt={entry.timer_started_at} capSec={capSec} />
+              : done ? formatMs(finalMs) : <span className="text-zinc-700">—</span>}
+          </span>
+          {dnf && finalMs != null && (
+            <span className="text-[11px] text-zinc-400">time {formatMs(finalMs)}</span>
+          )}
+          {penalty !== 0 && !dnf && (
+            <span className="text-[11px] text-amber-400">penalty {formatPenalty(penalty)}</span>
+          )}
+        </div>
         <div className="flex items-center gap-1.5">
           {running && (
             <button onClick={onFinish} className="flex items-center gap-1 px-3 py-1.5 bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold rounded-lg transition-colors">
               <Flag size={13} /> Finish
             </button>
           )}
-          {done && (
+          {done && !dnf && (
             <button onClick={onResume} title="Resume from this time" className="flex items-center gap-1 px-3 py-1.5 bg-[#2f5fe0] hover:bg-[#2348b8] text-white text-xs font-semibold rounded-lg transition-colors">
               <FastForward size={13} /> Resume
             </button>
           )}
-          {(done || running) && (
+          {(done || running || dnf || penalty !== 0) && (
             <button onClick={onReset} title="Reset" className="text-zinc-500 hover:text-white p-1.5"><RotateCcw size={14} /></button>
           )}
         </div>
       </div>
+
+      {/* Penalty + DNF controls */}
+      <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-800/80">
+        <div className="flex items-center gap-1">
+          <PenaltyBtn label="−30" onClick={() => onPenalty(-30000)} />
+          <PenaltyBtn label="−5" onClick={() => onPenalty(-5000)} />
+          <span className="text-xs text-zinc-500 w-3 text-center"><Minus size={11} className="inline" /></span>
+          <span className="text-[10px] uppercase tracking-wider text-zinc-600">pen</span>
+          <span className="text-xs text-zinc-500 w-3 text-center"><Plus size={11} className="inline" /></span>
+          <PenaltyBtn label="+5" onClick={() => onPenalty(5000)} />
+          <PenaltyBtn label="+30" onClick={() => onPenalty(30000)} />
+        </div>
+        <button
+          onClick={() => onDnf(!dnf)}
+          className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${dnf ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700' : 'bg-red-950/60 text-red-400 border border-red-900/60 hover:bg-red-900/50'}`}
+        >
+          <Ban size={12} /> {dnf ? 'Un-DNF' : 'DNF'}
+        </button>
+      </div>
     </div>
+  )
+}
+
+function PenaltyBtn({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="px-1.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-semibold rounded tabular-nums transition-colors">
+      {label}
+    </button>
   )
 }
 
@@ -217,5 +290,5 @@ function LiveClock({ startedAt, capSec }: { startedAt: string; capSec: number })
     const id = setInterval(tick, 100)
     return () => clearInterval(id)
   }, [startedAt, capSec])
-  return <span className={ms >= capSec * 1000 ? 'text-amber-400' : 'text-[#4d7bff]'}>{formatMs(ms)}</span>
+  return <span className={ms >= capSec * 1000 ? 'text-red-400' : 'text-[#4d7bff]'}>{formatMs(ms)}</span>
 }

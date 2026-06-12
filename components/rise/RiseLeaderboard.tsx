@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT } from '@/lib/rise'
-import { rankEntries, entryValue, formatMs } from '@/types/rise'
+import { rankEntries, entryValue, formatMs, entryIsDnf, entryFinalMs, entryPenaltyMs, formatPenalty } from '@/types/rise'
 import type { RiseEntry, RiseEvent, RiseRound, RiseTeam, RiseGender } from '@/types/rise'
 import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG, SassicMark, SASSIC_SLUG_PREFIX } from './RiseBrand'
 
@@ -382,33 +382,47 @@ function TeamBoard({
 // ── Team-time board (e.g. Hyrox): one combined list of teams by finish time ──
 function TeamTimeBoard({ teams, entries, theme }: { teams: RiseTeam[]; entries: RiseEntry[]; theme: BoardTheme }) {
   const rows = teams.map(team => ({ team, entry: entries.find(e => e.team_id === team.id) ?? null }))
-  const bucket = (r: { entry: RiseEntry | null }) => (r.entry?.time_ms != null ? 0 : r.entry?.timer_running ? 1 : 2)
+  // Buckets: finished first (by final time), then running, then not-started, then DNF.
+  const bucket = (r: { entry: RiseEntry | null }) =>
+    r.entry && entryIsDnf(r.entry) ? 3 : r.entry?.time_ms != null ? 0 : r.entry?.timer_running ? 1 : 2
   rows.sort((a, b) => {
     const ba = bucket(a), bb = bucket(b)
     if (ba !== bb) return ba - bb
-    if (ba === 0) return (a.entry!.time_ms ?? 0) - (b.entry!.time_ms ?? 0)
+    if (ba === 0) return (entryFinalMs(a.entry!) ?? 0) - (entryFinalMs(b.entry!) ?? 0)
     return a.team.display_order - b.team.display_order
   })
-  const anyResult = rows.some(r => r.entry?.time_ms != null || r.entry?.timer_running)
+  const anyResult = rows.some(r => r.entry && (r.entry.time_ms != null || r.entry.timer_running || entryIsDnf(r.entry)))
   if (!anyResult) return <div className="mt-8"><Empty message="No teams on the clock yet. Standings appear here live." /></div>
 
   const medals = ['🥇', '🥈', '🥉']
+  let place = 0
   return (
     <div className="mt-8 space-y-3 max-w-3xl mx-auto">
-      {rows.map((r, i) => {
-        const done = r.entry?.time_ms != null
-        const running = !!r.entry?.timer_running
-        const isLeader = i === 0 && done
+      {rows.map(r => {
+        const dnf = r.entry ? entryIsDnf(r.entry) : false
+        const done = !dnf && r.entry?.time_ms != null
+        const running = !dnf && !!r.entry?.timer_running
+        const penalty = r.entry ? entryPenaltyMs(r.entry) : 0
+        if (done) place += 1
+        const isLeader = done && place === 1
         return (
-          <div key={r.team.id} className={`flex items-center gap-4 rounded-2xl border px-5 py-4 ${isLeader ? theme.leaderRow : running ? theme.advancingRow : theme.baseRow} ${running ? theme.timerHighlight : ''}`}>
+          <div key={r.team.id} className={`flex items-center gap-4 rounded-2xl border px-5 py-4 ${dnf ? theme.baseRow + ' opacity-60' : isLeader ? theme.leaderRow : running ? theme.advancingRow : theme.baseRow} ${running ? theme.timerHighlight : ''}`}>
             <span className={`text-2xl font-black tabular-nums w-10 text-center ${isLeader ? theme.rankLeader : theme.rankBase}`}>
-              {done ? (medals[i] ?? i + 1) : '—'}
+              {done ? (medals[place - 1] ?? place) : '—'}
             </span>
-            <p className="flex-1 min-w-0 text-xl sm:text-2xl font-black truncate">{r.team.name}</p>
-            <span className={`text-3xl sm:text-4xl font-black tabular-nums ${theme.value}`}>
-              {running && r.entry?.timer_started_at
-                ? <LiveTimer startedAt={r.entry.timer_started_at} />
-                : done ? formatMs(r.entry!.time_ms) : <span className="text-zinc-700">—</span>}
+            <div className="flex-1 min-w-0">
+              <p className="text-xl sm:text-2xl font-black truncate">{r.team.name}</p>
+              {done && penalty !== 0 && (
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-500">penalty {formatPenalty(penalty)}</span>
+              )}
+              {dnf && entryFinalMs(r.entry!) != null && (
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">time {formatMs(entryFinalMs(r.entry!))}</span>
+              )}
+            </div>
+            <span className={`text-3xl sm:text-4xl font-black tabular-nums ${dnf ? 'text-red-500/80 text-2xl sm:text-3xl' : theme.value}`}>
+              {dnf ? 'DNF'
+                : running && r.entry?.timer_started_at ? <LiveTimer startedAt={r.entry.timer_started_at} />
+                : done ? formatMs(entryFinalMs(r.entry!)) : <span className="text-zinc-700">—</span>}
             </span>
           </div>
         )

@@ -180,6 +180,25 @@ export function rankEntries(entries: RiseEntry[], mode: RiseScoringMode): RiseEn
   return sorted
 }
 
+// ── Penalty / DNF (stored on entry.meta, used by team-timed events) ──
+export function entryPenaltyMs(e: { meta?: Record<string, unknown> }): number {
+  const v = e.meta?.penalty_ms
+  return typeof v === 'number' ? v : 0
+}
+export function entryIsDnf(e: { meta?: Record<string, unknown> }): boolean {
+  return e.meta?.dnf === true
+}
+// Final time = recorded time + penalty (never below zero). Null until a time exists.
+export function entryFinalMs(e: { time_ms: number | null; meta?: Record<string, unknown> }): number | null {
+  return e.time_ms != null ? Math.max(0, e.time_ms + entryPenaltyMs(e)) : null
+}
+// Signed penalty label, e.g. "+0:15" / "−0:05".
+export function formatPenalty(ms: number): string {
+  if (!ms) return '0'
+  const sign = ms > 0 ? '+' : '−'
+  return sign + formatMs(Math.abs(ms)).replace(/\.\d+$/, '')
+}
+
 // The headline value for an entry, formatted for display.
 export function entryValue(entry: RiseEntry, mode: RiseScoringMode, unit: string): string {
   switch (mode) {
