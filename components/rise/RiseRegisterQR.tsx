@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react'
 import { Copy, Check, ExternalLink } from 'lucide-react'
 import { QRCodeDisplay } from '@/components/admin/QRCodeDisplay'
 
-export function RiseRegisterQR({ slug }: { slug: string }) {
+export function RiseRegisterQR({ slug, path = 'register' }: { slug: string; path?: string }) {
   const [link, setLink] = useState('')
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    setLink(`${window.location.origin}/rise/${slug}/register`)
-  }, [slug])
+    setLink(`${window.location.origin}/rise/${slug}/${path}`)
+  }, [slug, path])
 
   function copy() {
     navigator.clipboard.writeText(link)
@@ -23,7 +23,7 @@ export function RiseRegisterQR({ slug }: { slug: string }) {
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="rounded-2xl bg-[var(--brand,#2f5fe0)]/10 border border-[var(--brand,#2f5fe0)]/30 p-4">
-        <QRCodeDisplay url={link} label={`${slug}-register`} />
+        <QRCodeDisplay url={link} label={`${slug}-${path}`} />
       </div>
       <div className="flex items-center gap-2">
         <button onClick={copy} className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-[var(--brand,#2f5fe0)] hover:bg-[var(--brand-press,#2348b8)] text-[var(--brand-contrast,#fff)] rounded-md font-semibold transition-colors">

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { Radio, ExternalLink, ChevronLeft, QrCode, Pencil } from 'lucide-react'
+import { Radio, ExternalLink, ChevronLeft, QrCode, Pencil, UserCog } from 'lucide-react'
 import { RiseTokenManager } from '@/components/rise/RiseTokenManager'
 import { RiseJudgeReport } from '@/components/rise/RiseJudgeReport'
 import { RiseRoster } from '@/components/rise/RiseRoster'
@@ -141,6 +141,15 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
               <RiseRegisterQR slug={ev.slug} />
             </div>
           )}
+
+          {/* Supervisor registration QR (all events) */}
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-[var(--brand-text,#4d7bff)] uppercase tracking-wider mb-1">
+              <UserCog size={15} /> Supervisor Registration
+            </h2>
+            <p className="text-xs text-zinc-500 mb-4">Give this to the event supervisor — they register participants (name, gender, optional phone &amp; email) for {ev.name}.</p>
+            <RiseRegisterQR slug={ev.slug} path="supervisor" />
+          </div>
 
           {/* Judge links */}
           <RiseTokenManager event={ev} teams={teamList} initialTokens={(tokens as RiseJudgeToken[] | null) ?? []} />
