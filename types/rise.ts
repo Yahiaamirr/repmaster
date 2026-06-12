@@ -2,6 +2,7 @@
 
 export type RiseScoringMode = 'reps' | 'time_fastest' | 'time_longest' | 'measure_max'
 export type RiseGender = 'M' | 'F'
+export type RiseMovement = 'mu' | 'pu' | 'dips'
 export type RiseStatus = 'setup' | 'live' | 'ended'
 export type RiseRoundStatus = 'pending' | 'active' | 'done'
 export type RiseEntryStatus = 'pending' | 'active' | 'done'
@@ -19,6 +20,7 @@ export interface RiseEventConfig {
   wave_size?: number
   auto_dnf?: boolean // auto-DNF a team that passes the cap (default on)
   show_women_on_leaderboard?: boolean
+  movement_scored?: boolean // team scored by 3 per-movement judges (mu/pu/dips), total = sum
   [key: string]: unknown
 }
 
@@ -123,7 +125,7 @@ export interface RiseJudgeToken {
   event_id: string
   token: string
   label: string | null
-  scope: { team_id?: string; competitor_id?: string; round_id?: string }
+  scope: { team_id?: string; competitor_id?: string; round_id?: string; movement?: RiseMovement }
   created_at: string
   judge_name?: string | null
   last_seen_at?: string | null
@@ -143,6 +145,23 @@ export interface RiseJudgeLog {
   // joined
   competitor?: { name: string; gender: RiseGender } | null
   team?: { name: string } | null
+}
+
+// ── Movement judging (RISE Battle Cycles) ────────────────────
+// A team is scored by three judges — muscle-ups, pull-ups, dips — whose counts
+// live in entry.meta.reps and sum into counter.
+export const RISE_MOVEMENTS: RiseMovement[] = ['mu', 'pu', 'dips']
+export const MOVEMENT_LABEL: Record<RiseMovement, string> = { mu: 'Muscle-ups', pu: 'Pull-ups', dips: 'Dips' }
+export const MOVEMENT_SHORT: Record<RiseMovement, string> = { mu: 'MU', pu: 'PU', dips: 'Dips' }
+
+export function movementReps(entry: Pick<RiseEntry, 'meta'>): Record<RiseMovement, number> {
+  const reps = (entry.meta?.reps ?? {}) as Partial<Record<RiseMovement, number>>
+  return { mu: reps.mu ?? 0, pu: reps.pu ?? 0, dips: reps.dips ?? 0 }
+}
+
+// kg load for a movement from the event's chipper config (undefined if unset).
+export function movementLoad(config: RiseEventConfig, m: RiseMovement): number | undefined {
+  return config.chipper?.[`${m}_kg`]
 }
 
 // ── Helpers shared across leaderboard + control ──────────────

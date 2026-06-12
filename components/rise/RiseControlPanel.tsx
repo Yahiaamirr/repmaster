@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Minus, Plus, Play, Flag, ListPlus, RotateCcw, AlertTriangle, UserCheck, Search, Save, Pencil, Venus } from 'lucide-react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
-import { ENTRY_SELECT, adjustCounter } from '@/lib/rise'
-import { rankEntries, entryValue, formatMs } from '@/types/rise'
+import { ENTRY_SELECT, adjustCounter, adjustMovement } from '@/lib/rise'
+import { rankEntries, entryValue, formatMs, movementReps, RISE_MOVEMENTS, MOVEMENT_SHORT } from '@/types/rise'
+import type { RiseMovement } from '@/types/rise'
 import { RiseWaveControl } from './RiseWaveControl'
 import { RiseTeamManager } from './RiseTeamManager'
 import { eventShowsWomen } from './RiseLeaderboard'
@@ -121,12 +122,14 @@ export function RiseControlPanel({
           supabase={supabase}
         />
       )}
-      <ScoreOverridePanel
-        event={event}
-        entries={entries}
-        setEntries={setEntries}
-        supabase={supabase}
-      />
+      {!event.config.movement_scored && (
+        <ScoreOverridePanel
+          event={event}
+          entries={entries}
+          setEntries={setEntries}
+          supabase={supabase}
+        />
+      )}
     </div>
   )
 }
@@ -504,9 +507,21 @@ function TeamControl({
     setBusy(false)
   }
 
+  const movementScored = !!ev.config.movement_scored
+
   async function override(entry: RiseEntry, delta: number) {
     setEntries((prev: RiseEntry[]) => prev.map(e => (e.id === entry.id ? { ...e, counter: Math.max(0, e.counter + delta) } : e)))
     await adjustCounter(supabase, entry.id, delta)
+  }
+
+  async function overrideMovement(entry: RiseEntry, m: RiseMovement, delta: number) {
+    setEntries((prev: RiseEntry[]) => prev.map(e => {
+      if (e.id !== entry.id) return e
+      const reps = movementReps(e)
+      const next = { ...reps, [m]: Math.max(0, reps[m] + delta) }
+      return { ...e, meta: { ...e.meta, reps: next }, counter: next.mu + next.pu + next.dips }
+    }))
+    await adjustMovement(supabase, entry.id, m, delta)
   }
 
   const activeRound = roundList.find(r => r.status === 'active') ?? qual
@@ -590,11 +605,31 @@ function TeamControl({
                 <span className="font-bold text-white">{e.team?.name ?? 'Team'}</span>
                 {e.phase && <span className="text-[10px] uppercase tracking-widest text-zinc-500">{e.phase}</span>}
               </div>
-              <div className="flex items-center justify-between">
-                <button onClick={() => override(e, -1)} className="h-12 w-12 flex items-center justify-center bg-zinc-800 active:bg-zinc-700 rounded-lg text-white"><Minus size={20} /></button>
-                <span className="text-5xl font-black tabular-nums text-[#2f5fe0]">{e.counter}</span>
-                <button onClick={() => override(e, 1)} className="h-12 w-12 flex items-center justify-center bg-[#2f5fe0] active:bg-[#2348b8] rounded-lg text-white"><Plus size={20} /></button>
-              </div>
+              {movementScored ? (
+                <div className="space-y-2">
+                  {RISE_MOVEMENTS.map(m => {
+                    const reps = movementReps(e)
+                    return (
+                      <div key={m} className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-semibold text-zinc-400 w-9">{MOVEMENT_SHORT[m]}</span>
+                        <button onClick={() => overrideMovement(e, m, -1)} className="h-8 w-8 flex items-center justify-center bg-zinc-800 active:bg-zinc-700 rounded-md text-white"><Minus size={15} /></button>
+                        <span className="flex-1 text-center text-2xl font-black tabular-nums text-white">{reps[m]}</span>
+                        <button onClick={() => overrideMovement(e, m, 1)} className="h-8 w-8 flex items-center justify-center bg-[#2f5fe0] active:bg-[#2348b8] rounded-md text-white"><Plus size={15} /></button>
+                      </div>
+                    )
+                  })}
+                  <div className="flex items-center justify-between pt-2 mt-1 border-t border-zinc-800">
+                    <span className="text-[10px] uppercase tracking-widest text-zinc-500">Total</span>
+                    <span className="text-3xl font-black tabular-nums text-[#2f5fe0]">{e.counter}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <button onClick={() => override(e, -1)} className="h-12 w-12 flex items-center justify-center bg-zinc-800 active:bg-zinc-700 rounded-lg text-white"><Minus size={20} /></button>
+                  <span className="text-5xl font-black tabular-nums text-[#2f5fe0]">{e.counter}</span>
+                  <button onClick={() => override(e, 1)} className="h-12 w-12 flex items-center justify-center bg-[#2f5fe0] active:bg-[#2348b8] rounded-lg text-white"><Plus size={20} /></button>
+                </div>
+              )}
             </div>
           ))
         )}

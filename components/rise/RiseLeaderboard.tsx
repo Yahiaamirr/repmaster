@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT } from '@/lib/rise'
-import { rankEntries, entryValue, formatMs, entryIsDnf, entryFinalMs, entryPenaltyMs, formatPenalty } from '@/types/rise'
+import { rankEntries, entryValue, formatMs, entryIsDnf, entryFinalMs, entryPenaltyMs, formatPenalty, movementReps, MOVEMENT_SHORT } from '@/types/rise'
 import type { RiseEntry, RiseEvent, RiseRound, RiseTeam, RiseGender } from '@/types/rise'
 import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG, SassicMark, SASSIC_SLUG_PREFIX } from './RiseBrand'
 
@@ -351,10 +351,11 @@ function TeamBoard({
   const qualifiers = isQual ? 2 : 0
   const buyIn = !isQual ? chipperBuyIn(event.config.chipper) : null
 
+  const movementScored = !!event.config.movement_scored
   const rows = teams
     .map(team => {
       const e = roundEntries.find(x => x.team_id === team.id)
-      return { team, counter: e?.counter ?? 0, phase: e?.phase ?? null, hasEntry: !!e }
+      return { team, counter: e?.counter ?? 0, phase: e?.phase ?? null, hasEntry: !!e, reps: e ? movementReps(e) : null }
     })
     .sort((a, b) => b.counter - a.counter)
 
@@ -399,6 +400,11 @@ function TeamBoard({
               )}
               {row.phase === 'amrap' && (
                 <span className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">AMRAP</span>
+              )}
+              {movementScored && row.reps && row.counter > 0 && (
+                <p className="mt-1 text-[11px] font-semibold tabular-nums text-zinc-500">
+                  {MOVEMENT_SHORT.mu} {row.reps.mu} · {MOVEMENT_SHORT.pu} {row.reps.pu} · {MOVEMENT_SHORT.dips} {row.reps.dips}
+                </p>
               )}
             </div>
             <span className={`text-5xl sm:text-6xl font-black tabular-nums ${isLeader ? theme.counterLeader : theme.counterBase}`}>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Clock, Radio } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { fetchScopedEntries, logJudge, pickActiveEntry } from '@/lib/rise'
-import type { RiseEntry, RiseEvent } from '@/types/rise'
+import type { RiseEntry, RiseEvent, RiseMovement } from '@/types/rise'
 import { brandVars } from '@/lib/rise-theme'
 import { JudgeCounter } from './JudgeCounter'
 import { JudgeTimer } from './JudgeTimer'
@@ -20,7 +20,7 @@ export function RiseJudgeClient({
   event: RiseEvent
   token: string
   label: string
-  scope: { team_id?: string; competitor_id?: string }
+  scope: { team_id?: string; competitor_id?: string; movement?: RiseMovement }
   initialEntries: RiseEntry[]
 }) {
   const supabase = createClient()
@@ -64,7 +64,7 @@ export function RiseJudgeClient({
   if (!entry) return <WaitingState event={event} label={label} />
 
   const common = { event, entry, label, onLocalChange }
-  if (event.scoring_mode === 'reps') return <JudgeCounter {...common} />
+  if (event.scoring_mode === 'reps') return <JudgeCounter {...common} movement={scope.movement} />
   if (event.scoring_mode === 'measure_max') return <JudgeMeasure {...common} />
   return <JudgeTimer {...common} />
 }

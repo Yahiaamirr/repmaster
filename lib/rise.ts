@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { RiseEntry } from '@/types/rise'
+import type { RiseEntry, RiseMovement } from '@/types/rise'
 
 // Columns to select for an entry plus its joined competitor/team.
 export const ENTRY_SELECT =
@@ -9,6 +9,16 @@ export const ENTRY_SELECT =
 
 export async function adjustCounter(supabase: SupabaseClient, entryId: string, delta: number) {
   return supabase.rpc('rise_adjust_counter', { p_entry_id: entryId, p_delta: delta })
+}
+
+// Bump one movement's count on a team entry; the RPC keeps counter = mu+pu+dips.
+export async function adjustMovement(
+  supabase: SupabaseClient,
+  entryId: string,
+  movement: RiseMovement,
+  delta: number,
+) {
+  return supabase.rpc('rise_adjust_movement', { p_entry_id: entryId, p_movement: movement, p_delta: delta })
 }
 
 export async function timerStart(supabase: SupabaseClient, entryId: string) {
@@ -65,7 +75,7 @@ export function pickActiveEntry(entries: RiseEntry[]): RiseEntry | null {
 export async function fetchScopedEntries(
   supabase: SupabaseClient,
   eventId: string,
-  scope: { team_id?: string; competitor_id?: string }
+  scope: { team_id?: string; competitor_id?: string; movement?: RiseMovement }
 ): Promise<RiseEntry[]> {
   let query = supabase.from('rise_entries').select(ENTRY_SELECT).eq('event_id', eventId)
   if (scope.team_id) query = query.eq('team_id', scope.team_id)

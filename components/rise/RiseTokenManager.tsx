@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { Plus, Copy, Check, QrCode, Trash2, ShieldX } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { QRCodeDisplay } from '@/components/admin/QRCodeDisplay'
-import type { RiseEvent, RiseJudgeToken, RiseTeam } from '@/types/rise'
+import { MOVEMENT_LABEL, RISE_MOVEMENTS } from '@/types/rise'
+import type { RiseEvent, RiseJudgeToken, RiseMovement, RiseTeam } from '@/types/rise'
 
 export function RiseTokenManager({
   event,
@@ -19,18 +20,36 @@ export function RiseTokenManager({
   const [tokens, setTokens] = useState<RiseJudgeToken[]>(initialTokens)
   const [busy, setBusy] = useState(false)
   const [teamId, setTeamId] = useState(teams[0]?.id ?? '')
+  const [movement, setMovement] = useState<RiseMovement>('mu')
+  const movementScored = !!event.config.movement_scored
 
   function linkFor(token: string) {
     const origin = typeof window !== 'undefined' ? window.location.origin : ''
     return `${origin}/judge/rise/${token}`
   }
 
+  // Default judge links per team: one each for movement-scored events (mu/pu/dips),
+  // otherwise a single link per team.
   async function generateTeamTokens() {
     setBusy(true)
-    const existingTeamIds = new Set(tokens.map(t => t.scope?.team_id).filter(Boolean))
-    const inserts = teams
-      .filter(t => !existingTeamIds.has(t.id))
-      .map(t => ({ event_id: event.id, label: `${t.name} — Judge`, scope: { team_id: t.id } }))
+    let inserts: { event_id: string; label: string; scope: RiseJudgeToken['scope'] }[]
+    if (movementScored) {
+      const existing = new Set(
+        tokens.filter(t => t.scope?.team_id && t.scope?.movement).map(t => `${t.scope!.team_id}:${t.scope!.movement}`)
+      )
+      inserts = teams.flatMap(t =>
+        RISE_MOVEMENTS.filter(m => !existing.has(`${t.id}:${m}`)).map(m => ({
+          event_id: event.id,
+          label: `${t.name} — ${MOVEMENT_LABEL[m]}`,
+          scope: { team_id: t.id, movement: m },
+        }))
+      )
+    } else {
+      const existingTeamIds = new Set(tokens.map(t => t.scope?.team_id).filter(Boolean))
+      inserts = teams
+        .filter(t => !existingTeamIds.has(t.id))
+        .map(t => ({ event_id: event.id, label: `${t.name} — Judge`, scope: { team_id: t.id } }))
+    }
     if (inserts.length) {
       const { data } = await supabase.from('rise_judge_tokens').insert(inserts).select('*')
       if (data) setTokens(prev => [...prev, ...(data as RiseJudgeToken[])])
@@ -42,10 +61,15 @@ export function RiseTokenManager({
     if (!teamId) return
     setBusy(true)
     const team = teams.find(t => t.id === teamId)
-    const n = tokens.filter(t => t.scope?.team_id === teamId).length + 1
+    const scope: RiseJudgeToken['scope'] = movementScored
+      ? { team_id: teamId, movement }
+      : { team_id: teamId }
+    const label = movementScored
+      ? `${team?.name ?? 'Team'} — ${MOVEMENT_LABEL[movement]}`
+      : `${team?.name ?? 'Team'} — Judge ${tokens.filter(t => t.scope?.team_id === teamId).length + 1}`
     const { data } = await supabase
       .from('rise_judge_tokens')
-      .insert({ event_id: event.id, label: `${team?.name ?? 'Team'} — Judge ${n}`, scope: { team_id: teamId } })
+      .insert({ event_id: event.id, label, scope })
       .select('*')
       .single()
     if (data) setTokens(prev => [...prev, data as RiseJudgeToken])
@@ -89,7 +113,11 @@ export function RiseTokenManager({
     await supabase.from('rise_judge_tokens').delete().eq('event_id', event.id)
     let created: RiseJudgeToken[] = []
     if (event.is_team) {
-      const inserts = teams.map(t => ({ event_id: event.id, label: `${t.name} — Judge`, scope: { team_id: t.id } }))
+      const inserts = movementScored
+        ? teams.flatMap(t => RISE_MOVEMENTS.map(m => ({
+            event_id: event.id, label: `${t.name} — ${MOVEMENT_LABEL[m]}`, scope: { team_id: t.id, movement: m },
+          })))
+        : teams.map(t => ({ event_id: event.id, label: `${t.name} — Judge`, scope: { team_id: t.id } }))
       const { data } = await supabase.from('rise_judge_tokens').insert(inserts).select('*')
       created = (data as RiseJudgeToken[] | null) ?? []
     } else {
@@ -140,7 +168,7 @@ export function RiseTokenManager({
             disabled={busy}
             className="flex items-center gap-1.5 text-xs px-3 py-2 bg-[var(--brand,#2f5fe0)] hover:bg-[var(--brand-press,#2348b8)] disabled:opacity-50 text-[var(--brand-contrast,#fff)] rounded-md font-semibold transition-colors"
           >
-            <Plus size={14} /> One link per team
+            <Plus size={14} /> {movementScored ? 'Three links per team (MU/PU/Dips)' : 'One link per team'}
           </button>
           <span className="text-zinc-600 text-xs">or add extra:</span>
           <select
@@ -152,6 +180,17 @@ export function RiseTokenManager({
               <option key={t.id} value={t.id}>{t.name}</option>
             ))}
           </select>
+          {movementScored && (
+            <select
+              value={movement}
+              onChange={e => setMovement(e.target.value as RiseMovement)}
+              className="text-xs bg-zinc-800 border border-zinc-700 rounded-md px-2 py-2 text-white outline-none focus:border-[var(--brand,#2f5fe0)]"
+            >
+              {RISE_MOVEMENTS.map(m => (
+                <option key={m} value={m}>{MOVEMENT_LABEL[m]}</option>
+              ))}
+            </select>
+          )}
           <button
             onClick={addTeamJudge}
             disabled={busy}
@@ -173,7 +212,9 @@ export function RiseTokenManager({
       {tokens.length === 0 ? (
         <p className="text-zinc-500 text-sm">
           {event.is_team
-            ? 'Generate one judge link per team — each opens that team’s rep counter. Add extra links for backup judges.'
+            ? movementScored
+              ? 'Generate three judge links per team — muscle-ups, pull-ups and dips. Each opens that movement’s counter; the team total is their sum.'
+              : 'Generate one judge link per team — each opens that team’s rep counter. Add extra links for backup judges.'
             : 'Add a judge station — one device scores every athlete (tap an athlete, then time/measure). Add more for parallel judging.'}
         </p>
       ) : (
@@ -183,7 +224,7 @@ export function RiseTokenManager({
               key={t.id}
               token={t}
               link={linkFor(t.token)}
-              subtitle={teamName(t.scope?.team_id)}
+              subtitle={[teamName(t.scope?.team_id), t.scope?.movement && MOVEMENT_LABEL[t.scope.movement]].filter(Boolean).join(' · ') || undefined}
               onRevoke={() => revoke(t.id)}
             />
           ))}

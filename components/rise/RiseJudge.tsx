@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { Radio, Lock, MonitorSmartphone, UserRound } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { RiseCompetitor, RiseEntry, RiseEvent, RiseTeam } from '@/types/rise'
+import type { RiseCompetitor, RiseEntry, RiseEvent, RiseMovement, RiseTeam } from '@/types/rise'
 import { RiseJudgeClient } from './RiseJudgeClient'
 import { RiseJudgeRoster } from './RiseJudgeRoster'
 import { RiseJudgeTeamRoster } from './RiseJudgeTeamRoster'
@@ -40,7 +40,7 @@ export function RiseJudge({
   token: string
   event: RiseEvent
   mode: 'scoped' | 'roster'
-  scope: { team_id?: string; competitor_id?: string }
+  scope: { team_id?: string; competitor_id?: string; movement?: RiseMovement }
   initialEntries: RiseEntry[]
   competitors: RiseCompetitor[]
   teams?: RiseTeam[]
