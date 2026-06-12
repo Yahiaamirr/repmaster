@@ -49,6 +49,12 @@ export default function HomePage() {
           Admin Dashboard
         </Link>
         <Link
+          href="/leaderboards"
+          className="px-8 py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-lg transition-colors text-center"
+        >
+          Live Leaderboards
+        </Link>
+        <Link
           href="/admin/tournaments/new"
           className="px-8 py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold rounded-lg transition-colors text-center"
         >
