@@ -27,6 +27,23 @@ export interface RiseEvent {
   status: RiseStatus
   display_order: number
   created_at: string
+  manual_leaderboard?: boolean
+}
+
+// A hand-curated leaderboard row. When event.manual_leaderboard is true the
+// public board renders these (value_text + manual_rank) instead of live entries.
+export interface RiseManualResult {
+  id: string
+  event_id: string
+  competitor_id: string | null
+  team_id: string | null
+  value_text: string | null
+  manual_rank: number
+  included: boolean
+  created_at: string
+  // joined
+  competitor?: { name: string; gender: RiseGender } | null
+  team?: { name: string } | null
 }
 
 export interface RiseTeam {

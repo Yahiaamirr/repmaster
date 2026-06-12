@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { Radio, ExternalLink, ChevronLeft, QrCode, Pencil, UserCog } from 'lucide-react'
+import { Radio, ExternalLink, ChevronLeft, QrCode, Pencil, UserCog, Trophy } from 'lucide-react'
 import { RiseTokenManager } from '@/components/rise/RiseTokenManager'
 import { RiseJudgeReport } from '@/components/rise/RiseJudgeReport'
 import { RiseRoster } from '@/components/rise/RiseRoster'
@@ -96,6 +96,9 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
             </Link>
             <Link href={`/admin/rise/${ev.slug}/control`} className="flex items-center gap-1.5 text-sm px-4 py-2 bg-[var(--brand,#2f5fe0)] hover:bg-[var(--brand-press,#2348b8)] text-[var(--brand-contrast,#fff)] rounded-lg font-semibold transition-colors">
               <Radio size={15} /> Control
+            </Link>
+            <Link href={`/admin/rise/${ev.slug}/leaderboard`} className="flex items-center gap-1.5 text-sm px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors">
+              <Trophy size={15} /> Leaderboard
             </Link>
             <a href={`/rise/${ev.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors">
               <ExternalLink size={15} /> Board
