@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT } from '@/lib/rise'
 import { rankEntries, entryValue, formatMs, entryIsDnf, entryFinalMs, entryPenaltyMs, formatPenalty } from '@/types/rise'
@@ -206,6 +207,7 @@ export function RiseLeaderboard({
   const supabase = createClient()
   const [entries, setEntries] = useState(initialEntries)
   const [roundList, setRoundList] = useState(rounds)
+  const [showWomen, setShowWomen] = useWomenVisibility(event.slug)
 
   useEffect(() => {
     const channel = supabase
@@ -239,9 +241,59 @@ export function RiseLeaderboard({
         ) : event.config.team_timed ? (
           <TeamTimeBoard teams={teams} entries={entries} theme={theme} />
         ) : (
-          <SplitBoard event={event} entries={entries} theme={theme} />
+          <>
+            <WomenVisibilityToggle showWomen={showWomen} setShowWomen={setShowWomen} theme={theme} />
+            <SplitBoard event={event} entries={entries} theme={theme} showWomen={showWomen} />
+          </>
         )}
       </div>
+    </div>
+  )
+}
+
+const WOMEN_VISIBILITY_KEY = 'rise:leaderboards:show-women'
+
+export function defaultShowWomen(slug: string) {
+  return slug !== EVOLVE_SLUG && slug !== RLNTLSS_SLUG
+}
+
+export function useWomenVisibility(slug: string) {
+  const [showWomen, setShowWomenState] = useState(() => defaultShowWomen(slug))
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(WOMEN_VISIBILITY_KEY)
+    if (stored === 'show') setShowWomenState(true)
+    if (stored === 'hide') setShowWomenState(false)
+  }, [])
+
+  const setShowWomen = (next: boolean) => {
+    setShowWomenState(next)
+    window.localStorage.setItem(WOMEN_VISIBILITY_KEY, next ? 'show' : 'hide')
+  }
+
+  return [showWomen, setShowWomen] as const
+}
+
+export function WomenVisibilityToggle({
+  showWomen,
+  setShowWomen,
+  theme,
+}: {
+  showWomen: boolean
+  setShowWomen: (next: boolean) => void
+  theme: BoardTheme
+}) {
+  const Icon = showWomen ? EyeOff : Eye
+  return (
+    <div className="mt-6 flex justify-center">
+      <button
+        type="button"
+        onClick={() => setShowWomen(!showWomen)}
+        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition-colors ${theme.genderContainer} ${theme.rowDivider} ${theme.pageText}`}
+      >
+        <Icon size={14} strokeWidth={2.5} aria-hidden="true" />
+        {showWomen ? 'Hide women' : 'Show women'}
+      </button>
     </div>
   )
 }
@@ -432,9 +484,8 @@ function TeamTimeBoard({ teams, entries, theme }: { teams: RiseTeam[]; entries: 
 }
 
 // ── Split board (individual events, Male / Female) ──────────
-function SplitBoard({ event, entries, theme }: { event: RiseEvent; entries: RiseEntry[]; theme: BoardTheme }) {
+function SplitBoard({ event, entries, theme, showWomen }: { event: RiseEvent; entries: RiseEntry[]; theme: BoardTheme; showWomen: boolean }) {
   const byGender = (g: RiseGender) => entries.filter(e => (e.competitor?.gender ?? 'M') === g)
-  const showWomen = event.slug !== EVOLVE_SLUG
   return (
     <div className={`mt-8 grid grid-cols-1 ${showWomen ? 'lg:grid-cols-2' : 'max-w-3xl mx-auto'} gap-6`}>
       <GenderColumn title="Men" event={event} entries={byGender('M')} theme={theme} />

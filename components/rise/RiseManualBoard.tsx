@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { boardTheme, Header, type BoardTheme } from './RiseLeaderboard'
-import { EVOLVE_SLUG } from './RiseBrand'
+import { boardTheme, Header, WomenVisibilityToggle, useWomenVisibility, type BoardTheme } from './RiseLeaderboard'
 import { isTeamScored } from '@/types/rise'
 import type { RiseEvent, RiseManualResult, RiseGender } from '@/types/rise'
 
@@ -20,7 +19,7 @@ export function RiseManualBoard({
   const [manual, setManual] = useState(initialManual)
   const theme = boardTheme(event.slug)
   const teamMode = isTeamScored(event)
-  const showWomen = event.slug !== EVOLVE_SLUG
+  const [showWomen, setShowWomen] = useWomenVisibility(event.slug)
 
   // Live-refresh as the admin edits/republishes the manual standings.
   useEffect(() => {
@@ -45,10 +44,13 @@ export function RiseManualBoard({
         {teamMode ? (
           <Column title={null} rows={rows} theme={theme} />
         ) : (
-          <div className={`mt-8 grid grid-cols-1 ${showWomen ? 'lg:grid-cols-2' : 'max-w-3xl mx-auto'} gap-6`}>
-            <Column title="Men" rows={rows.filter(r => (r.competitor?.gender ?? 'M') === 'M')} theme={theme} />
-            {showWomen && <Column title="Women" rows={rows.filter(r => (r.competitor?.gender ?? 'M') === 'F')} theme={theme} />}
-          </div>
+          <>
+            <WomenVisibilityToggle showWomen={showWomen} setShowWomen={setShowWomen} theme={theme} />
+            <div className={`mt-8 grid grid-cols-1 ${showWomen ? 'lg:grid-cols-2' : 'max-w-3xl mx-auto'} gap-6`}>
+              <Column title="Men" rows={rows.filter(r => (r.competitor?.gender ?? 'M') === 'M')} theme={theme} />
+              {showWomen && <Column title="Women" rows={rows.filter(r => (r.competitor?.gender ?? 'M') === 'F')} theme={theme} />}
+            </div>
+          </>
         )}
       </div>
     </div>
