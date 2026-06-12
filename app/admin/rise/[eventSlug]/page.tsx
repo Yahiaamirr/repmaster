@@ -5,7 +5,7 @@ import { Radio, ExternalLink, ChevronLeft, QrCode, Pencil, UserCog, Trophy } fro
 import { RiseTokenManager } from '@/components/rise/RiseTokenManager'
 import { RiseJudgeReport } from '@/components/rise/RiseJudgeReport'
 import { RiseRoster } from '@/components/rise/RiseRoster'
-import { RiseTeams } from '@/components/rise/RiseTeams'
+import { RiseTeamManager } from '@/components/rise/RiseTeamManager'
 import { RiseRegisterQR } from '@/components/rise/RiseRegisterQR'
 import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG } from '@/components/rise/RiseBrand'
 import type { RiseCompetitor, RiseEvent, RiseJudgeLog, RiseJudgeToken, RiseTeam } from '@/types/rise'
@@ -168,7 +168,7 @@ export default async function RiseSetupPage({ params }: { params: Promise<{ even
 
       {/* Teams — group athletes into teams */}
       <div className="mt-6">
-        <RiseTeams eventId={ev.id} initialTeams={teamList} initialCompetitors={comps} />
+        <RiseTeamManager eventId={ev.id} initialTeams={teamList} initialCompetitors={comps} allowTeamEdits />
       </div>
     </div>
   )

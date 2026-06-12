@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT, adjustCounter } from '@/lib/rise'
 import { rankEntries, entryValue, formatMs } from '@/types/rise'
 import { RiseWaveControl } from './RiseWaveControl'
+import { RiseTeamManager } from './RiseTeamManager'
 import { eventShowsWomen } from './RiseLeaderboard'
 import type {
   RiseCompetitor, RiseEntry, RiseEvent, RiseRound, RiseScoringMode, RiseStatus, RiseTeam,
@@ -77,6 +78,15 @@ export function RiseControlPanel({
         isTeam={event.is_team}
         initialCompetitors={competitors}
       />
+      {event.is_team && (
+        <RiseTeamManager
+          eventId={event.id}
+          initialTeams={teams}
+          initialCompetitors={competitors}
+          collapsible
+          defaultOpen={false}
+        />
+      )}
       {event.is_team ? (
         <TeamControl
           event={event}
