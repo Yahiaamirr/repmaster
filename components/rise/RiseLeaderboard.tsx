@@ -434,10 +434,11 @@ function TeamTimeBoard({ teams, entries, theme }: { teams: RiseTeam[]; entries: 
 // ── Split board (individual events, Male / Female) ──────────
 function SplitBoard({ event, entries, theme }: { event: RiseEvent; entries: RiseEntry[]; theme: BoardTheme }) {
   const byGender = (g: RiseGender) => entries.filter(e => (e.competitor?.gender ?? 'M') === g)
+  const showWomen = event.slug !== EVOLVE_SLUG
   return (
-    <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className={`mt-8 grid grid-cols-1 ${showWomen ? 'lg:grid-cols-2' : 'max-w-3xl mx-auto'} gap-6`}>
       <GenderColumn title="Men" event={event} entries={byGender('M')} theme={theme} />
-      <GenderColumn title="Women" event={event} entries={byGender('F')} theme={theme} />
+      {showWomen && <GenderColumn title="Women" event={event} entries={byGender('F')} theme={theme} />}
     </div>
   )
 }

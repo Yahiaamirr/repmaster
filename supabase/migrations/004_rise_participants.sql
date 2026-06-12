@@ -66,7 +66,7 @@ from rise_events e join (values
   ('Zein ELSHAER','M',50)
 ) as v(name,gender,ord) on e.slug = 'lftd-hyrox';
 
--- evolve-deadlift-ladder (33)
+-- evolve-deadlift-ladder (25)
 insert into rise_competitors (event_id, name, gender, display_order)
 select e.id, v.name, v.gender::rise_gender, v.ord
 from rise_events e join (values
@@ -78,31 +78,23 @@ from rise_events e join (values
   ('Hassan Hatem','M',6),
   ('Hossam Eissa','M',7),
   ('Ibrahim ahmed hosni','M',8),
-  ('Janna yasser','F',9),
-  ('Jannah Karim ElSokkary','F',10),
-  ('Kenzy ahmed','F',11),
-  ('Kotb mahmoud','M',12),
-  ('Malak amr abdelaziz mostfa abdo Zatoun','F',13),
-  ('Menna Dafrawy','F',14),
-  ('Mohamed hany abozeid','M',15),
-  ('Muaaz Helal','M',16),
-  ('muhammed amr muhammed','M',17),
-  ('Nasrbibers','M',18),
-  ('Omar elshaer','M',19),
-  ('Omar Maged Shaker','M',20),
-  ('Omar Mohamed','M',21),
-  ('Omar Mohamed Shehata','M',22),
-  ('Omar Sherif','M',23),
-  ('Radwan Ali Radwan','M',24),
-  ('Rawan nasser hussien','F',25),
-  ('Roaa saqr','F',26),
-  ('Seif Abdelrehim','M',27),
-  ('Shady Ashraf','M',28),
-  ('Tia Youssef Anwar','F',29),
-  ('Yassin Ahmed','M',30),
-  ('Yassin Nader','M',31),
-  ('Youssef ashraf fam','M',32),
-  ('Zein ELSHAER','M',33)
+  ('Kotb mahmoud','M',9),
+  ('Mohamed hany abozeid','M',10),
+  ('Muaaz Helal','M',11),
+  ('muhammed amr muhammed','M',12),
+  ('Nasrbibers','M',13),
+  ('Omar elshaer','M',14),
+  ('Omar Maged Shaker','M',15),
+  ('Omar Mohamed','M',16),
+  ('Omar Mohamed Shehata','M',17),
+  ('Omar Sherif','M',18),
+  ('Radwan Ali Radwan','M',19),
+  ('Seif Abdelrehim','M',20),
+  ('Shady Ashraf','M',21),
+  ('Yassin Ahmed','M',22),
+  ('Yassin Nader','M',23),
+  ('Youssef ashraf fam','M',24),
+  ('Zein ELSHAER','M',25)
 ) as v(name,gender,ord) on e.slug = 'evolve-deadlift-ladder';
 
 -- rlntlss-box-jumps (45)
@@ -188,4 +180,3 @@ from rise_events e join (values
   ('Youssef ashraf fam','M',26),
   ('Zein ELSHAER','M',27)
 ) as v(name,gender,ord) on e.slug = 'turbo-deadhang';
-
