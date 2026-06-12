@@ -255,7 +255,7 @@ export function Header({ event, roundName, theme }: { event: RiseEvent; roundNam
       <div className={`pointer-events-none absolute inset-0 ${theme.headerGlow}`} />
       <div className="relative">
         <div className="flex items-center justify-center gap-4 mb-5">
-          <RiseWordmark className={`h-8 sm:h-10 w-auto ${isLftd ? 'brightness-0' : ''}`} />
+          <RiseWordmark className={`h-8 sm:h-10 w-auto ${isLftd || isSassic ? 'brightness-0' : ''}`} />
           {isRlntlss && (
             <>
               <span className="text-zinc-700 text-sm">×</span>
