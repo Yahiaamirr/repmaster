@@ -45,6 +45,14 @@ export function LftdMark({ className = 'h-12 w-auto' }: { className?: string }) 
 // Slug of the LFTD-branded event.
 export const LFTD_SLUG = 'lftd-hyrox'
 
+// SASSIC sponsor mark (black on white — inverted to white on black for dark surfaces).
+export function SassicMark({ className = 'h-10 w-auto' }: { className?: string }) {
+  return <img src="/rise/sassic-logo.jpg" alt="SASSIC" className={`${className} invert rounded-sm`} draggable={false} />
+}
+
+// Slug prefix for SASSIC-branded events (suffix is dynamic).
+export const SASSIC_SLUG_PREFIX = 'sassic'
+
 // Co-brand strip (RISE presents · Relentless) for footers.
 export function RiseCoBrandFooter() {
   return (

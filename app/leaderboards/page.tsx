@@ -7,7 +7,7 @@ import { RiseWordmark } from '@/components/rise/RiseBrand'
 
 export const dynamic = 'force-dynamic'
 
-const LOGOS: Record<string, { src: string; bg: string; contain?: boolean }> = {
+const LOGOS: Record<string, { src: string; bg: string; contain?: boolean; large?: boolean }> = {
   'rise-battle-cycles':                    { src: '/rise/rise-logo.png',    bg: '#000000' },
   'rise-ring-pushups-challenge-mqb12k1g':  { src: '/rise/rise-logo.png',    bg: '#000000' },
   'evolve-deadlift-ladder':                { src: '/rise/evolve-logo.webp', bg: '#ffffff', contain: true },
@@ -15,7 +15,7 @@ const LOGOS: Record<string, { src: string; bg: string; contain?: boolean }> = {
   'turbo-deadhang':                        { src: '/rise/turbo-logo.jpg',   bg: '#000000' },
   'rlntlss-box-jumps':                     { src: '/rise/rlntlss-logo.png', bg: '#000000' },
   'rltnlss-mqayem06':                      { src: '/rise/rlntlss-logo.png', bg: '#000000' },
-  'sassic-pushups-challenge-mqb26s3p':     { src: '/rise/sassic-logo.jpg',  bg: '#ffffff', contain: true },
+  'sassic-pushups-challenge-mqb26s3p':     { src: '/rise/sassic-logo.jpg',  bg: '#ffffff', contain: true, large: true },
 }
 
 // Per-event accent, mirroring each board's sponsor theme.
@@ -60,7 +60,7 @@ export default async function LeaderboardsPage() {
               className="group relative flex items-center gap-4 rounded-2xl border border-[#1a2547] bg-[#0b1226] px-5 py-5 transition-colors hover:border-[var(--accent)]/60 hover:bg-[#101a3a]"
             >
               <span
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl overflow-hidden"
+                className={`flex shrink-0 items-center justify-center rounded-xl overflow-hidden ${LOGOS[ev.slug]?.large ? 'h-14 w-14' : 'h-11 w-11'}`}
                 style={{ background: LOGOS[ev.slug]?.bg ?? `color-mix(in srgb, ${accent} 15%, transparent)` }}
               >
                 {LOGOS[ev.slug] ? (

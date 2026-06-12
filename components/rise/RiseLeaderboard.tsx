@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ENTRY_SELECT } from '@/lib/rise'
 import { rankEntries, entryValue, formatMs } from '@/types/rise'
 import type { RiseEntry, RiseEvent, RiseRound, RiseTeam, RiseGender } from '@/types/rise'
-import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG } from './RiseBrand'
+import { RiseWordmark, RlntlssMark, RLNTLSS_SLUG, EvolveMark, EVOLVE_SLUG, TurboMark, TURBO_SLUG, LftdMark, LFTD_SLUG, SassicMark, SASSIC_SLUG_PREFIX } from './RiseBrand'
 
 // ── Per-event board theming ─────────────────────────────────
 // Default is the RISE navy/blue look. The Evolve event uses a monochrome
@@ -219,10 +219,11 @@ export function RiseLeaderboard({
 }
 
 export function Header({ event, roundName, theme }: { event: RiseEvent; roundName: string | null; theme: BoardTheme }) {
-  const isRlntlss = event.slug === RLNTLSS_SLUG
+  const isRlntlss = event.slug === RLNTLSS_SLUG || event.slug.startsWith('rltnlss')
   const isEvolve = event.slug === EVOLVE_SLUG
   const isTurbo = event.slug === TURBO_SLUG
   const isLftd = event.slug === LFTD_SLUG
+  const isSassic = event.slug.startsWith(SASSIC_SLUG_PREFIX)
   return (
     <header className={`relative text-center py-9 px-4 border-b ${theme.headerBorder} overflow-hidden`}>
       <div className={`pointer-events-none absolute inset-0 ${theme.headerGlow}`} />
@@ -251,6 +252,12 @@ export function Header({ event, roundName, theme }: { event: RiseEvent; roundNam
             <>
               <span className="text-[#0f2e64]/40 text-sm">×</span>
               <LftdMark className="h-12 sm:h-14 w-auto" />
+            </>
+          )}
+          {isSassic && (
+            <>
+              <span className="text-zinc-700 text-sm">×</span>
+              <SassicMark className="h-10 sm:h-12 w-auto" />
             </>
           )}
         </div>
