@@ -1,17 +1,18 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { ChevronRight, Users, User, Timer, Dumbbell, ArrowUp } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import Image from 'next/image'
 import type { RiseEvent } from '@/types/rise'
 import { RiseWordmark, RiseCoBrandFooter } from '@/components/rise/RiseBrand'
 
 export const dynamic = 'force-dynamic'
 
-const ICONS: Record<string, React.ReactNode> = {
-  'rise-battle-cycles': <Users size={20} />,
-  'evolve-deadlift-ladder': <Dumbbell size={20} />,
-  'lftd-hyrox': <Timer size={20} />,
-  'turbo-deadhang': <User size={20} />,
-  'rlntlss-box-jumps': <ArrowUp size={20} />,
+const LOGOS: Record<string, { src: string; bg: string }> = {
+  'rise-battle-cycles':    { src: '/rise/rise-logo.png',    bg: 'bg-black' },
+  'evolve-deadlift-ladder':{ src: '/rise/evolve-logo.webp', bg: 'bg-white' },
+  'lftd-hyrox':            { src: '/rise/lftd-logo.jpg',    bg: 'bg-[#d4e84a]' },
+  'turbo-deadhang':        { src: '/rise/turbo-logo.jpg',   bg: 'bg-black' },
+  'rlntlss-box-jumps':     { src: '/rise/rlntlss-logo.png', bg: 'bg-black' },
 }
 
 export default async function RiseIndexPage() {
@@ -42,8 +43,10 @@ export default async function RiseIndexPage() {
             href={`/rise/${ev.slug}`}
             className="group flex items-center gap-4 rounded-2xl border border-[#1a2547] bg-[#0b1226] px-5 py-5 transition-colors hover:border-[#2f5fe0]/50 hover:bg-[#101a3a]"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#2f5fe0]/15 text-[#2f5fe0]">
-              {ICONS[ev.slug] ?? <User size={20} />}
+            <span className={`flex h-11 w-11 items-center justify-center rounded-xl overflow-hidden ${LOGOS[ev.slug]?.bg ?? 'bg-[#2f5fe0]/15'}`}>
+              {LOGOS[ev.slug] ? (
+                <Image src={LOGOS[ev.slug].src} alt={ev.name} width={44} height={44} className="w-full h-full object-cover" />
+              ) : null}
             </span>
             <div className="flex-1 min-w-0">
               <p className="font-black text-lg truncate">{ev.name}</p>
