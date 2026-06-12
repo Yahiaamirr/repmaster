@@ -27,6 +27,13 @@ export function RiseWaveControl({
 }) {
   const capSec = event.config.time_cap_sec ?? RISE_TIME_CAP_DEFAULT
   const waveSize = event.config.wave_size ?? RISE_WAVE_SIZE_DEFAULT
+  const [autoDnf, setAutoDnf] = useState(event.config.auto_dnf !== false)
+
+  async function toggleAutoDnf() {
+    const v = !autoDnf
+    setAutoDnf(v)
+    await supabase.from('rise_events').update({ config: { ...event.config, auto_dnf: v } }).eq('id', event.id)
+  }
 
   const genderRank = (g: 'M' | 'F' | null) => (g === 'F' ? 0 : g === 'M' ? 1 : 2)
   const ordered = [...teams].sort(
@@ -113,10 +120,11 @@ export function RiseWaveControl({
     await supabase.from('rise_entries').update({ meta, updated_at: new Date().toISOString() }).eq('id', entry.id)
   }
 
-  // A running team that passes the time cap is auto-DNF'd.
+  // A running team that passes the time cap is auto-DNF'd (when enabled).
   const dnfRef = useRef(setDnf)
   dnfRef.current = setDnf
   useEffect(() => {
+    if (!autoDnf) return
     const id = setInterval(() => {
       for (const e of entries) {
         if (e.timer_running && e.timer_started_at && e.team_id && !entryIsDnf(e)) {
@@ -127,7 +135,7 @@ export function RiseWaveControl({
       }
     }, 1000)
     return () => clearInterval(id)
-  }, [entries, capSec])
+  }, [entries, capSec, autoDnf])
 
   if (teams.length === 0) {
     return (
@@ -145,9 +153,18 @@ export function RiseWaveControl({
           <Timer size={16} className="text-[#4d7bff]" />
           <span className="text-sm font-semibold">Wave control</span>
         </div>
-        <span className="text-xs text-zinc-500">
-          {waveSize} teams / wave · past {Math.round(capSec / 60)} min → auto-DNF · female teams first
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-zinc-500">
+            {waveSize} teams / wave · {Math.round(capSec / 60)} min cap · female teams first
+          </span>
+          <button
+            onClick={toggleAutoDnf}
+            title={autoDnf ? `Teams past ${Math.round(capSec / 60)} min are auto-DNF'd` : 'Teams are not auto-DNF’d at the cap'}
+            className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md font-semibold transition-colors ${autoDnf ? 'bg-red-950/60 text-red-400 border border-red-900/60' : 'bg-zinc-800 text-zinc-400'}`}
+          >
+            <Ban size={13} /> Auto-DNF: {autoDnf ? 'On' : 'Off'}
+          </button>
+        </div>
       </div>
 
       {waves.map((wave, wi) => {

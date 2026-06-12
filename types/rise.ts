@@ -17,6 +17,7 @@ export interface RiseEventConfig {
   team_timed?: boolean
   time_cap_sec?: number
   wave_size?: number
+  auto_dnf?: boolean // auto-DNF a team that passes the cap (default on)
   [key: string]: unknown
 }
 
