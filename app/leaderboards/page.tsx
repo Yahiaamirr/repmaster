@@ -69,7 +69,7 @@ export default async function LeaderboardsPage() {
                     alt={ev.name}
                     width={56}
                     height={56}
-                    className={`w-full h-full ${LOGOS[ev.slug].contain ? `object-contain${LOGOS[ev.slug].zoom ? ' scale-[3.5]' : ' p-1'}` : 'object-cover'}`}
+                    className={`w-full h-full ${LOGOS[ev.slug].contain ? `object-contain${LOGOS[ev.slug].zoom ? ' scale-[2.2]' : ' p-1'}` : 'object-cover'}`}
                   />
                 ) : null}
               </span>
