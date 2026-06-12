@@ -211,6 +211,13 @@ function TeamTimerCard({
   const done = entry?.time_ms != null
   const running = !!entry?.timer_running
   const finalMs = entry ? entryFinalMs(entry) : null
+  const [penInput, setPenInput] = useState('')
+  const applyPenalty = (sign: 1 | -1) => {
+    const sec = parseFloat(penInput)
+    if (!sec || sec <= 0) return
+    onPenalty(sign * Math.round(sec * 1000))
+    setPenInput('')
+  }
 
   return (
     <div className={`rounded-xl border p-4 ${dnf ? 'border-red-500/40 bg-red-500/5' : done ? 'border-green-500/40 bg-green-500/5' : running ? 'border-[#2f5fe0]/50 bg-[#102047]' : 'border-zinc-800 bg-zinc-900'}`}>
@@ -251,16 +258,23 @@ function TeamTimerCard({
         </div>
       </div>
 
-      {/* Penalty + DNF controls */}
+      {/* Penalty (custom amount) + DNF controls */}
       <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-800/80">
-        <div className="flex items-center gap-1">
-          <PenaltyBtn label="−30" onClick={() => onPenalty(-30000)} />
-          <PenaltyBtn label="−5" onClick={() => onPenalty(-5000)} />
-          <span className="text-xs text-zinc-500 w-3 text-center"><Minus size={11} className="inline" /></span>
-          <span className="text-[10px] uppercase tracking-wider text-zinc-600">pen</span>
-          <span className="text-xs text-zinc-500 w-3 text-center"><Plus size={11} className="inline" /></span>
-          <PenaltyBtn label="+5" onClick={() => onPenalty(5000)} />
-          <PenaltyBtn label="+30" onClick={() => onPenalty(30000)} />
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] uppercase tracking-wider text-zinc-600">Penalty</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min={0}
+            value={penInput}
+            onChange={e => setPenInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') applyPenalty(1) }}
+            placeholder="sec"
+            className="w-14 bg-zinc-800 border border-zinc-700 rounded-md px-2 py-1 text-xs text-white text-right outline-none focus:border-[#2f5fe0]"
+          />
+          <button onClick={() => applyPenalty(-1)} title="Subtract time" className="px-1.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded transition-colors"><Minus size={13} /></button>
+          <button onClick={() => applyPenalty(1)} title="Add time" className="px-1.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded transition-colors"><Plus size={13} /></button>
+          {penalty !== 0 && <span className="text-[11px] text-amber-400 tabular-nums">{formatPenalty(penalty)}</span>}
         </div>
         <button
           onClick={() => onDnf(!dnf)}
@@ -270,14 +284,6 @@ function TeamTimerCard({
         </button>
       </div>
     </div>
-  )
-}
-
-function PenaltyBtn({ label, onClick }: { label: string; onClick: () => void }) {
-  return (
-    <button onClick={onClick} className="px-1.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-semibold rounded tabular-nums transition-colors">
-      {label}
-    </button>
   )
 }
 
